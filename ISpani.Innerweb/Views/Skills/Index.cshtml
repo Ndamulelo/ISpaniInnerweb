@@ -1,0 +1,53 @@
+﻿@model AddSkillViewModel;
+
+@{
+    ViewData["Title"] = "Create Skills";
+    Layout = "~/Views/Shared/_JobSeekerLayout.cshtml";
+
+    IList<SelectListItem> skills = new List<SelectListItem>();
+
+    //Only display the skills that are not already assigned to the seeker
+    skills = new List<SelectListItem>();
+
+    foreach (var item in Model.Skills)
+    {
+
+        skills.Add(new SelectListItem(item.Description, item.Id));
+    }
+}
+
+<h1>Create Skills</h1>
+
+<form action="" class="mb-2">
+
+    <div class="row">
+
+        <div class="col-md-2">
+            <label for="Skill">Skill</label>
+
+            <select name="SkillId" asp-items="@skills" class="form-control" id="SkillId">
+            </select>
+
+        </div>        
+        
+        <div class="col-md-2">
+            <label for="SkillLevelId">Level</label>
+
+            <select name="SkillLeveId" asp-items="@(new SelectList(Model.SkillLevels,"Id","Level"))" class="form-control" id="SkillLeveId">
+            </select>
+
+        </div>
+
+        <div class="col-sm-auto">
+            <button class="mt-4 btn btn-primary form-control" id="CreateSkill">Create Skill</button>
+        </div>
+
+    </div>
+</form>
+
+@section Scripts{
+
+    <script src="~/js/Skill.js"></script>
+
+}
+

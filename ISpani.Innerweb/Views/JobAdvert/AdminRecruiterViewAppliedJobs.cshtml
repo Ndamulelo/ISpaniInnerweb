@@ -1,0 +1,77 @@
+﻿@model List<RecruiterAppliedJobs>;
+
+@{
+    ViewData["Title"] = "AdminRecruiterViewAppliedJobs";
+    Layout = "~/Views/Shared/_AdminRecruiterLayout.cshtml";
+}
+
+<!-- Basic table -->
+<div class="card">
+    <div class="card-header header-elements-inline">
+        <h5 class="card-title">Job Applications</h5>
+    </div>
+
+    <!--<div class="header-elements text-right mr-2">
+
+        <a asp-action="ExportRecruiterAppliedJobsReport" asp-controller="JobAdvert" class="btn btn-success">Export</a>
+
+    </div>-->
+
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+
+                    <th>Date</th>
+                    <th>ApplicantName</th>
+                    <th>Contacts</th><!--email+phone-->
+                    <th>Job</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    if (Model != null)
+                    {
+                        foreach (var item in Model)
+                        {
+                            var statusClass = "";
+
+                            if (item.ApplicationStatus.Equals("Interview"))
+                            {
+                                statusClass = "badge bg-success-400";
+                            }
+                            else if (item.ApplicationStatus.Equals("Declined"))
+                            {
+                                statusClass = "badge bg-danger-400";
+                            }
+                            else
+                            {
+                                statusClass = "badge bg-blue-400";
+                            }
+
+                            var parms = new Dictionary<string, string>
+                                            {
+                                { "id", item.JobSeekerId },
+                                { "jobAdvertId", item.JobAdvertId }
+                            };
+
+                            <tr>
+                                <td>@item.DateCreated.ToString("yyyy-MM-dd")</td>
+                                <td>@item.ApplicantName</td>
+                                <td>@item.ApplicantPhone <a href="mailto:@item.Email">@item.Email</a></td>
+                                <td>@item.JobCaption</td>
+                                <td><span class="@statusClass">@item.ApplicationStatus</span></td>
+                                <td>
+                                    <a asp-action="RecruiterAppliedJobsDetails" asp-controller="JobAdvert" asp-all-route-data="parms" class="btn btn-primary"> View </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<!-- /basic table -->

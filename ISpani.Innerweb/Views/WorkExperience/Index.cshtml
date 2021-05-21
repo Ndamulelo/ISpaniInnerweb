@@ -1,0 +1,64 @@
+﻿
+@model JobSeekerAddExperienceViewModel;
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_JobSeekerLayout.cshtml";
+}
+
+<h5 class="page-title"> Create Work Experience</h5>
+<form asp-action="Create" asp-controller="WorkExperience" method="POST" class="mb-1">
+    @if (TempData["WorkExperienceCreate"] != null)
+    {
+        <div class="alert alert-success" role="alert">@TempData["WorkExperienceCreate"]</div>
+    }
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <div class="form-row">
+        <div class="col-md-6 mb-3">
+            <label asp-for=" @Model.JobSeekerExperienceViewModel.JobTitle">JobTitle</label>
+            <input type="text" asp-for=@Model.JobSeekerExperienceViewModel.JobTitle class="form-control"
+                   id="JobTitle">
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label asp-for="@Model.JobSeekerExperienceViewModel.CompanyName">Company Name</label>
+            <input type="text" asp-for="@Model.JobSeekerExperienceViewModel.CompanyName" class="form-control">
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <label for="StartDate">Date From</label>
+
+            <input type="date" asp-for="@Model.JobSeekerExperienceViewModel.StartDate" class="form-control"
+                   min="2000-02-27" max="@DateTime.Now.ToString("yyyy-MM-dd")" id="StartDate">
+        </div>
+
+        <div class="col-md-3 mb-3 mb-3">
+            <label for="EndDate">Date To</label>
+
+            <input type="date" asp-for="@Model.JobSeekerExperienceViewModel.EndDate" class="form-control"
+                   min="2000-02-27" max="@DateTime.Now.ToString("yyyy-MM-dd")" id="EndDate">
+        </div>
+
+        <div class="col-md-3 mb-3">
+            <label asp-for="@Model.JobSeekerExperienceViewModel.StartDate">Job Category</label>
+            <select asp-for="@Model.JobSeekerExperienceViewModel.JobCategoryId" class="form-control" id="CategoryId" asp-items="@(new SelectList(Model.JobCategories,"Id","Name"))" required>
+            </select>
+        </div>
+
+        <div class="col-md-3 mt-3">
+            <label asp-for="@Model.JobSeekerExperienceViewModel.IsCurrentCompany">  Current</label>
+            <input asp-for="@Model.JobSeekerExperienceViewModel.IsCurrentCompany" id="IsCurrentCompany" type="checkbox" />
+        </div>
+
+        <div class="col-md-3">
+            <button class="btn btn-primary form-control" type="submit">Create</button>
+        </div>
+    </div>
+
+</form>
+
+@section Scripts{
+
+    <script src="~/js/Profile.js"></script>
+
+}
+

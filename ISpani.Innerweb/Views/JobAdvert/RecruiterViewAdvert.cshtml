@@ -1,0 +1,31 @@
+﻿@model AdminRecruiterSearchAdvertViewModel;
+@{
+    ViewData["Title"] = "RecruiterViewAdvert";
+    Layout = "~/Views/Shared/_AdminRecruiterLayout.cshtml";
+}
+
+<form asp-action="RecruiterAdvertList" asp-controller="JobAdvert" method="get">
+    <div class="form-row">
+        <div class="col-md-4 mb-3">
+            <label for="jobCategoryId">Job Category</label>
+            <select asp-items="@(new SelectList(Model.JobCategories,"Id","Name"))" for="jobCategoryId" name="jobCategoryId" class="form-control">
+            </select>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <label for="jobTypeId">Job Type</label>
+            <select asp-items="@(new SelectList(Model.JobTypes,"Id","Description"))" for="jobTypeId" name="jobTypeId" class="form-control">
+            </select>
+        </div>
+
+        <div class="col-md-4 mt-4">
+
+            <button type="submit" class="btn btn-primary form-control">Search</button>
+        </div>
+
+    </div>
+
+</form>
+
+<partial name="_JobAdvertCard" model="Model.ViewJobAdvertViewModel" />
+

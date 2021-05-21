@@ -1,0 +1,54 @@
+﻿@model RecruiterProfileViewModel;
+@{
+    ViewData["Title"] = "Profile";
+    Layout = "~/Views/Shared/_AdminRecruiterLayout.cshtml";
+}
+
+
+<form method="POST" asp-action="Profile" asp-controller="Recruiter">
+    
+    @{ if (TempData["RecruiterProfile"] != null)
+        {
+            <div class="alert alert-success">@TempData["RecruiterProfile"]</div>
+        }
+    }
+
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <div class="form-row">
+        <div class="col-md-4 mb-3">
+            <label asp-for="FisrtName">First name</label>
+            <input type="text" name="FisrtName" class="form-control" value="@Model.FisrtName">
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <label asp-for="LastName">Last name</label>
+            <input type="text" name="LastName" class="form-control" value="@Model.LastName">
+        </div>
+
+    </div>
+
+    <div class="form-row">
+        <div class="col-md-4 mb-3">
+            <label asp-for="Phone">Phone</label>
+            <input type="text" name="Phone" class="form-control" value="@Model.Phone">
+        </div>        
+        
+        <div class="col-md-4 mb-3">
+            <label asp-for="CompanyName">Company</label>
+            <input type="text" disabled name="CompanyName" class="form-control" value="@Model.CompanyName">
+            <input type="hidden" name="CompanyId" class="form-control" value="@Model.CompanyId">
+        </div>
+
+    </div>
+
+    <div class="form-row">
+
+        <div class="col-md-4">
+            <button class="btn btn-primary" type="submit">Update</button>
+        </div>
+
+    </div>
+
+</form>
+
+

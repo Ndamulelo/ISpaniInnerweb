@@ -1,0 +1,68 @@
+﻿
+@model List<JobSeekerApplicationHistory>;
+@{
+    ViewData["Title"] = "JobApplicationHistory";
+    Layout = "~/Views/Shared/_JobSeekerLayout.cshtml";
+}
+
+<!-- Basic table -->
+<div class="card">
+    <div class="card-header header-elements-inline">
+        <h5 class="card-title">Job Applications History</h5>
+    </div>
+
+    <!--<div class="header-elements text-right mr-2">
+
+        <a asp-action="ExportJobHistoryReport" asp-controller="JobSeeker" class="btn btn-success">Export</a>
+
+    </div>-->
+
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Date</th>
+                    <th>Job Title</th>
+                    <th>Company Name</th><!--email+phone-->
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @{
+
+                    if (Model != null)
+                    {
+                        foreach (var item in Model)
+                        {
+                            var statusClass = "";
+
+                            if (item.Status.Equals("Interview"))
+                            {
+                                statusClass = "badge bg-success-400";
+                            }
+                            else if (item.Status.Equals("Declined"))
+                            {
+                                statusClass = "badge bg-danger-400";
+                            }
+                            else
+                            {
+                                statusClass = "badge bg-blue-400";
+                            }
+
+                            <tr>
+                                <td></td>
+                                <td>@item.CreatedDate.ToString("yyyy-MM-dd")</td>
+                                <td>@item.JobTtitle</td>
+                                <td>@item.Company</td>
+                                <td><span class="@statusClass">@item.Status</span></td>
+                            </tr>
+                        }
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<!-- /basic table -->

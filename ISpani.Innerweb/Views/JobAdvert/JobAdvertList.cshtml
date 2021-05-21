@@ -1,0 +1,51 @@
+﻿
+@model AdminRecruiterSearchAdvertViewModel;
+@{
+    ViewData["Title"] = "JobAdvertList";
+    Layout = "~/Views/Shared/_AdminRecruiterLayout.cshtml";
+}
+
+<form asp-action="JobAdvertList" asp-controller="JobAdvert" method="get">
+    <div class="form-row">
+        <div class="col-md-4 mb-3">
+            <label for="jobCategoryId">Job Category</label>
+            <select asp-items="@(new SelectList(Model.JobCategories,"Id","Name"))" for="jobCategoryId" name="jobCategoryId" class="form-control">
+            </select>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <label for="jobTypeId">Job Type</label>
+            <select asp-items="@(new SelectList(Model.JobTypes,"Id","Description"))" for="jobTypeId" name="jobTypeId" class="form-control">
+            </select>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <label for="companyId">Company</label>
+            <select asp-items="@(new SelectList(Model.Companies,"Id","CompanyName"))" for ="companyId" name="companyId" class="form-control">
+            </select>
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="col-md-4 mb-3">
+            <label for="StartDate">Date From</label>
+
+            <input type="date" name="dateFrom" class="form-control" id="" min="2020-03-07" max="2022-01-01">
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <label for="EndDate">Date To</label>
+
+            <input type="date" name="dateTo" class="form-control" id="" min="2020-03-07" max="2022-01-01">
+
+        </div>
+
+        <div class="col-md-4 mt-4">
+
+            <button type="submit" class="btn btn-primary form-control">Search</button>
+        </div>
+    </div>
+
+</form>
+
+<partial name="_JobAdvertCard" model="Model.ViewJobAdvertViewModel"/>

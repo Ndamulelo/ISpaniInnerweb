@@ -1,0 +1,35 @@
+﻿@model JobSeekerSearchAdvertViewModel;
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = "_JobSeekerLayout";
+}
+
+
+<form apsp-action="Index" asp-controller="JobSeeker" method="get" class="mb-5" >
+    <div class="row">
+
+        <div class="col-md-3">
+            <select name="jobCategoryId" asp-items="@(new SelectList(Model.JobCategories,"Id","Name"))" class="form-control">
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <select name="jobCityId" asp-items="@(new SelectList(Model.JobCities,"Id","Name"))" class="form-control">
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-primary form-control">Find Jobs</button>
+        </div>
+
+        <!--
+            <div class="col-md-3">
+            <button type="submit" class="btn btn-primary form-control">Advance Search </button>
+        </div>-->
+
+    </div>
+</form>
+
+<partial name="_JobAdvertCard" model="@Model.ViewJobAdvertViewModel"/>

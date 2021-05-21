@@ -1,0 +1,543 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model JobSeekerProfileViewModelContainer;
+@{
+    Layout = "_JobSeekerLayout";
+    //Titiles
+    IList<SelectListItem> titles = new List<SelectListItem>();
+    IList<SelectListItem> genders = new List<SelectListItem>();
+    IList<SelectListItem> cities = new List<SelectListItem>();
+    IList<SelectListItem> ethnicities = new List<SelectListItem>();
+    IList<SelectListItem> provinces = new List<SelectListItem>();
+
+    foreach (var item in Model.Titles)
+    {
+        if (Model.JobSeekerPersonalDetailsViewModel != null)
+        {
+            titles.Add(new SelectListItem(item.TitleName, item.Id, item.Id.Equals(Model.JobSeekerPersonalDetailsViewModel.TitleId) ? true : false));
+        }
+        else
+        {
+            titles.Add(new SelectListItem(item.TitleName, item.Id));
+        }
+    }
+
+    foreach (var item in Model.Genders)
+    {
+        if (Model.JobSeekerPersonalDetailsViewModel != null)
+        {
+            genders.Add(new SelectListItem(item.Type, item.Id, item.Id.Equals(Model.JobSeekerPersonalDetailsViewModel.GenderId) ? true : false));
+        }
+        else
+        {
+            genders.Add(new SelectListItem(item.Type, item.Id));
+        }
+    }
+
+    foreach (var item in Model.Cities)
+    {
+        if (Model.JobSeekerPersonalDetailsViewModel != null)
+        {
+            cities.Add(new SelectListItem(item.Name, item.Id, item.Id.Equals(Model.JobSeekerPersonalDetailsViewModel.CityId) ? true : false));
+        }
+        else
+        {
+            cities.Add(new SelectListItem(item.Name, item.Id));
+        }
+    }
+
+
+    foreach (var item in Model.Provinces)
+    {
+        if (Model.JobSeekerPersonalDetailsViewModel != null)
+        {
+            provinces.Add(new SelectListItem(item.Name, item.Id, item.Id.Equals(Model.JobSeekerPersonalDetailsViewModel.ProvinceId) ? true : false));
+        }
+        else
+        {
+            provinces.Add(new SelectListItem(item.Name, item.Id));
+        }
+    }
+
+    foreach (var item in Model.Ethnicities)
+    {
+        if (Model.JobSeekerPersonalDetailsViewModel != null)
+        {
+            ethnicities.Add(new SelectListItem(item.EthnicityType, item.Id, item.Id.Equals(Model.JobSeekerPersonalDetailsViewModel.EthnicityId) ? true : false));
+        }
+        else
+        {
+            ethnicities.Add(new SelectListItem(item.EthnicityType, item.Id));
+        }
+    }
+    //int num = 0;
+}
+
+<!-- Introduction -->
+<div class="card">
+    <div class="card-header header-elements-inline">
+        <h5 class="card-title font-weight-bold">Personal Details</h5>
+        <div class="header-elements">
+            <div class="list-icons">
+                <a class="list-icons-item" data-action="collapse"></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <form>
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="form-row">
+                <div class="col-md-2 mb-3">
+                    <label for="TitleId">Title</label>
+                    <select name="TitleId" class="form-control" asp-items="@titles" id="TitleId">
+                    </select>
+                </div>
+
+                <div class="col-md-3 mb-3">
+                    <label for="FirstName">First name</label>
+                    <input type="text" name="FirstName" class="form-control"
+                           id="FirstName"
+                           value="@(Model.JobSeekerPersonalDetailsViewModel == null ? "" : Model.JobSeekerPersonalDetailsViewModel.FirstName)" required>
+                </div>
+
+                <div class="col-md-3 mb-3">
+                    <label for="LastName">Last name</label>
+                    <input type="text" name="LastName"
+                           class="form-control" id="LastName"
+                           value="@(Model.JobSeekerPersonalDetailsViewModel == null ? "" : Model.JobSeekerPersonalDetailsViewModel.LastName)" required>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label for="IdNumber">Id Number</label>
+                    <input type="number" name="IdNumber" maxlength="13" min="13"
+                           class="form-control" id="IdNumber"
+                           value="@(Model.JobSeekerPersonalDetailsViewModel == null ? "" : Model.JobSeekerPersonalDetailsViewModel.IdNumber)">
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label for="Gender">Gender</label>
+                    <select name="Gender" class="form-control" id="GenderId" asp-items="@genders" required>
+                    </select>
+                </div>
+
+
+                <!--<div class="col-md-4 mb-3">
+                    <label for="Email">Email</label>
+                    <input type="Email" name="Email"
+                    class="form-control" id="Email"
+                    value="" required>
+                </div>-->
+
+                <div class="col-md-4 mb-3">
+                    <label for="Phone">Phone</label>
+                    <input type="number" name="Phone" maxlength="10" minlength="10"
+                           class="form-control" id="Phone"
+                           value="@(Model.JobSeekerPersonalDetailsViewModel == null ? "" : Model.JobSeekerPersonalDetailsViewModel.Phone)" required>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label for="Ethnicity">Ethnicity</label>
+                    <select name="Ethnicity" class="form-control" id="EthnicityId" asp-items="@ethnicities" required>
+                    </select>
+                </div>
+
+                <div class="col-md-4 mb-3">
+
+                    <label for="Province">Province</label>
+                    <select name="Province" class="form-control" id="ProvinceId" asp-items="@provinces" required>
+                    </select>
+                </div>
+
+                <div class="col-md-4 mb-3">
+
+                    <label for="City">City</label>
+                    <select name="City" class="form-control" id="CityId" asp-items="@cities" required>
+                    </select>
+                </div>
+
+                <div class="col-md-2 mb-3">
+                    <label for="StreetNumber">Street Number</label>
+                    <input type="number" name="StreetNumber"
+                           class="form-control" id="StreetNumber" min="1" max="100000"
+                           value="@(Model.JobSeekerPersonalDetailsViewModel == null ? "" : Model.JobSeekerPersonalDetailsViewModel.StreetNumber)" required>
+                    <input type="hidden" id="AddressId" value="" @(Model.JobSeekerPersonalDetailsViewModel == null ? "" : Model.JobSeekerPersonalDetailsViewModel.AddressId)>
+                    <input type="hidden" id="JobSeekerId" value="" @(Model.JobSeekerPersonalDetailsViewModel == null ? "" : Model.JobSeekerPersonalDetailsViewModel.JobSeekerId)>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <label for="StreetName">Street Name</label>
+                    <input type="text" name="StreetName"
+                           class="form-control" id="StreetName"
+                           value="@(Model.JobSeekerPersonalDetailsViewModel == null ? "" : Model.JobSeekerPersonalDetailsViewModel.StreetName)" required>
+                </div>
+
+                <div class="col-md-2 mb-3">
+                    <label for="BuildingNumber">Building Number</label>
+                    <input type="number" name="BuildingNumber"
+                           class="form-control" id="BuildingNumber" min="1" max="100000"
+                           value="@(Model.JobSeekerPersonalDetailsViewModel == null ? "" : Model.JobSeekerPersonalDetailsViewModel.BuildingNumber)" required>
+                </div>
+            </div>
+
+            <label for="PersonalProfile">Personal Profile</label>
+            <textarea name="PersonalProfile" class="form-control" id="PersonalProfile" rows="5">
+                "@(Model.JobSeekerPersonalDetailsViewModel == null ? "" : Model.JobSeekerPersonalDetailsViewModel.PersonalProfile)"
+			</textarea>
+
+            <div class="col-md-3 mt-2">
+                <button class="btn btn-primary form-control" type="button" id="UpdatePersonalDetails">@(Model.JobSeekerPersonalDetailsViewModel == null ? "Add" : "Update")</button>
+            </div>
+
+        </form>
+    </div>
+</div>
+<!-- /Introduction-->
+<!-- Experience -->
+<div class="card">
+    <div class="card-header header-elements-inline">
+        <h5 class="card-title font-weight-bold">Work Experience</h5>
+        <div class="header-elements">
+            <a asp-action="Index" asp-controller="WorkExperience" class="btn btn-primary mr-1">Add New</a>
+            <div class="list-icons">
+                <a class="list-icons-item" data-action="collapse"></a>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="card-body">
+
+        @{
+            DateTime startDate;
+
+            IList<SelectListItem> categories = new List<SelectListItem>();
+
+            if (Model.JobSeekerExperienceViewModel != null)
+            {
+
+                foreach (var item in Model.JobSeekerExperienceViewModel)
+                {
+                    categories = new List<SelectListItem>();
+                    //Presect the right category
+                    foreach (var category in Model.JobCategories)
+                    {
+                        categories.Add(new SelectListItem(category.Name, category.Id, category.Id.Equals(item.JobCategoryId) ? true : false));
+                    }
+
+                    <form action="" class="mb-2">
+                        <div class="form-row">
+                            <div class="col-md-6">
+                                <label for="JobTitle">JobTitle</label>
+                                <input type="text" name="JobTitle" class="form-control" maxlength="200"
+                                       id="ExperienceJobTitle_@item.WorkExperienceId" value="@item.JobTitle" required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="CompanyName">Company Name</label>
+                                <input type="text" name="CompanyName" class="form-control" maxlength="200"
+                                       id="ExperienceCompanyName_@item.WorkExperienceId" value="@item.CompanyName" required>
+                            </div>
+
+                            <div class="col-md-3">
+                                <label for="StartDate">Date From</label>
+
+                                <input type="@(item.IsCurrentCompany == true ? "disabled" : "date")" name="StartDate" class="form-control"
+                                       id="ExperienceStartDate_@item.WorkExperienceId" value="@(item.IsCurrentCompany == true ? DateTime.Now.ToString("yyyy-MM-dd") : @item.EndDate.Value.ToString("yyyy-MM-dd"))" min="2021-02-27" max="2022-01-01">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label for="EndDate">Date To</label>
+
+                                <input type="@(item.IsCurrentCompany == true ? "disabled" : "date")" name="EndDate"
+                                       class="form-control" id="ExperienceEndDate_@item.WorkExperienceId" min="1999-02-27" max="2022-01-01"
+                                       value="@(item.IsCurrentCompany == true ? DateTime.Now.ToString("yyyy-MM-dd") : @item.EndDate.Value.ToString("yyyy-MM-dd"))">
+
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="JobCategory">Job Category</label>
+                                <select name="CategoryId" class="form-control" id="ExperienceCategory_@item.WorkExperienceId" asp-items="@categories" required>
+                                </select>
+                            </div>
+
+                            <input type="hidden" id="WorkExperienceIsCurrentCompany_@item.WorkExperienceId" value="@item.IsCurrentCompany">
+                            <div class="col-md-3 mt-2" id="KeyWorkExperienceId_@item.WorkExperienceId">
+                                <button class="btn btn-primary form-control EachExperience" type="button">Update</button>
+                            </div>
+
+                            <div class="col-md-3 mt-2" id="KeyWorkExperienceId_@item.WorkExperienceId">
+                                <a asp-action="Delete" asp-controller="WorkExperience" asp-route-id="@item.WorkExperienceId"
+                                   class="btn btn-danger" onclick="return confirm('Are you sure you want to delete experience from: @item.CompanyName')"> Delete </a>
+                            </div>
+                        </div>
+                    </form>
+
+                }
+            }
+        }
+
+    </div>
+
+</div>
+
+<!-- /Experience-->
+<!-- Education -->
+<div class="card">
+    <div class="card-header header-elements-inline">
+        <h5 class="card-title font-weight-bold">Education</h5>
+        <div class="header-elements">
+            <a asp-action="Index" asp-controller="Education" class="btn btn-primary mr-1">Add New</a>
+            <div class="list-icons">
+                <a class="list-icons-item" data-action="collapse"></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body">
+        @{
+            IList<SelectListItem> qualifications = new List<SelectListItem>();
+
+            if (Model.JobSeekerEducationViewModel != null)
+            {
+
+                foreach (var item in Model.JobSeekerEducationViewModel)
+                {
+                    qualifications = new List<SelectListItem>();
+                    //Presect the right category
+                    foreach (var qualification in Model.Qualifications)
+                    {
+                        qualifications.Add(new SelectListItem(qualification.Name, qualification.Id, qualification.Id.Equals(item.QualificationId) ? true : false));
+                    }
+                    <form action="" class="mb-2">
+                        <div class="form-row mb-2">
+                            <div class="col-md-3">
+                                <label for="GraduationYear">Graduation Year</label>
+                                <input type="number" name="GraduationYear" class="form-control" id="EducationGraduationYear_@item.EducationId" value="@item.GraduationYear">
+                            </div>
+
+                            <div class="col-md-3">
+                                <label for="Insitution">Institution</label>
+
+                                <input type="text" name="Institution" class="form-control" id="EducationInstitution_@item.EducationId" value="@item.Insitution">
+
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="FieldOfStudy">Field Of Study</label>
+                                <input type="text" name="FieldOfStudy" class="form-control" id="EducationFieldOfStudy_@item.EducationId" value="@item.FieldOfStudy">
+                            </div>
+
+                            <div class="col-md-4">
+
+                                <label for="QualificationId">Qualification</label>
+                                <select name="QualificationId" class="form-control" asp-items="@qualifications" id="EducationQualificationId_@item.EducationId">
+                                </select>
+                            </div>
+
+                            <div class="col-md-3 mt-4" id="KeyEducation_@item.EducationId">
+                                <button class="btn btn-primary form-control EachEducation" type="button">Update</button>
+                            </div>
+
+                            <div class="col-md-3 mt-4" id="KeyEducation_@item.EducationId">
+                                <a asp-action="Delete" asp-controller="Education" asp-route-id="@item.EducationId"
+                                   class="btn btn-danger" onclick="return confirm('Are you sure you want to delete education: @item.FieldOfStudy')"> Delete </a>
+                            </div>
+                        </div>
+                    </form>
+                }
+            }
+        }
+    </div>
+</div>
+<!-- /Education-->
+<!-- Skills -->
+<div class="card">
+    <div class="card-header header-elements-inline">
+        <h5 class="card-title font-weight-bold">Skills</h5>
+        <div class="header-elements">
+            <a asp-action="Index" asp-controller="Skills" class="btn btn-primary mr-1">Add New</a>
+            <div class="list-icons">
+                <a class="list-icons-item" data-action="collapse"></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body">
+
+        @{
+            IList<SelectListItem> skillLevels = new List<SelectListItem>();
+
+            if (Model.JobSeekerSkillsViewModel != null)
+            {
+
+                foreach (var item in Model.JobSeekerSkillsViewModel)
+                {
+                    skillLevels = new List<SelectListItem>();
+                    //Presect the right category
+                    foreach (var skillLevel in Model.SkillLevels)
+                    {
+                        skillLevels.Add(new SelectListItem(skillLevel.Level, skillLevel.Id, skillLevel.Id.Equals(item.SkillLevelId) ? true : false));
+                    }
+                    <form action="" class="mb-2">
+
+                        <div class="row">
+
+
+                            <div class="col-md-6">
+                                <label for="Skill">Skill</label>
+
+                                <input type="text" disabled name="SkillDescription" class="form-control" id="SkillDescription_@item.SkillId" value="@item.SkillDescription">
+
+                            </div>
+
+                            <div class="col-md-2">
+                                <label for="Skill">Level</label>
+
+                                <select name="SkillLeveId" asp-items="@skillLevels" class="form-control" id="SkillLevel_@item.SkillId">
+                                </select>
+
+                            </div>
+
+                            <div class="col-sm-auto" id="KeySkill_@item.SkillId">
+                                <button class="mt-4 btn btn-primary form-control EachSkill">Update</button>
+                            </div>
+
+                            <div class="col-sm-auto" id="KeySkill_@item.SkillId">
+                                <a asp-action="Delete" asp-controller="Skills" asp-route-id="@item.SkillId"
+                                   class="mt-4 btn btn-danger" onclick="return confirm('Are you sure you want to delete : @item.SkillDescription')"> Delete </a>
+                            </div>
+                        </div>
+                    </form>
+                }
+            }
+        }
+    </div>
+</div>
+<!-- /Skills-->
+<!-- Language -->
+<div class="card">
+    <div class="card-header header-elements-inline">
+        <h5 class="card-title font-weight-bold">languages</h5>
+        <div class="header-elements">
+            <a asp-action="Index" asp-controller="Language" class="btn btn-primary mr-1">Add New</a>
+            <div class="list-icons">
+                <a class="list-icons-item" data-action="collapse"></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body">
+        @{
+            IList<SelectListItem> LanguageLevels = new List<SelectListItem>();
+
+            if (Model.JobSeekerLanguagesViewModel != null)
+            {
+
+                foreach (var item in Model.JobSeekerLanguagesViewModel)
+                {
+                    LanguageLevels = new List<SelectListItem>();
+                    //Presect the right category
+                    foreach (var languageLevel in Model.LanguageLevels)
+                    {
+                        LanguageLevels.Add(new SelectListItem(languageLevel.DifficultyLevel, languageLevel.Id, languageLevel.Id.Equals(item.LanguageLevelId) ? true : false));
+                    }
+                    <form action="">
+                        <div class="row">
+
+                            <div class="col-md-6">
+                                <label for="languages">Languages</label>
+
+                                <input disabled type="text" name="LanguageName" class="form-control" id="Language_@item.LanguageId" value="@item.LanguageName">
+
+                            </div>
+
+                            <div class="col-md-2">
+                                <label for="LanguageLevel">Level</label>
+
+                                <select name="LanguageLevelId" asp-items="@LanguageLevels" class="form-control" id="LangugeLevel_@item.LanguageId">
+                                </select>
+
+                            </div>
+
+                            <div class="col-sm-auto" id="KeyLanguge_@item.LanguageId">
+                                <button type="button" class="mt-4 btn btn-primary form-control EachLanguage">Update</button>
+                            </div>
+
+                            <div class="col-sm-auto">
+                                <a asp-action="Delete" asp-controller="Language" asp-route-id="@item.LanguageId"
+                                   class="mt-4 btn btn-danger" onclick="return confirm('Are you sure you want to delete : @item.LanguageName')"> Delete </a>
+
+                            </div>
+                        </div>
+                    </form>
+
+                }
+            }
+        }
+    </div>
+</div>
+<!-- /Language-->
+
+<div class="card">
+    <div class="card-header header-elements-inline">
+        <h5 class="card-title font-weight-bold">Attachments</h5>
+        <div class="header-elements">
+            <div class="list-icons">
+                <a class="list-icons-item" data-action="collapse"></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body">
+
+        <form id="frmUploadCV" asp-action="UploadCV" asp-controller="JobSeeker" method="POST" enctype="multipart/form-data">
+            <div class="row">
+                <label asp-for="@Model.JobSeekerCVCreateViewModel.CV"></label>
+                <div class="col-md-4">
+                    <input asp-for="@Model.JobSeekerCVCreateViewModel.CV" accept="application/pdf" name="CV" id="CvDoc" class="form-control">
+                </div>
+
+                <div class="col-sm-auto" id="UploadCV">
+                    <button type="submit" class="mt-4 btn btn-primary form-control UploadCV">Upload</button>
+                </div>
+
+            </div>
+        </form>
+
+        <form id="frmUploadAcademicRecord" asp-action="UploadAcademicRecord" asp-controller="JobSeeker" method="POST" enctype="multipart/form-data">
+            <div class="row">
+                <label asp-for="@Model.JobSeekerCreateAcademicRecordViewModel.AcademicRecord">Academic Record</label>
+                <div class="col-md-4">
+                    <input asp-for="@Model.JobSeekerCreateAcademicRecordViewModel.AcademicRecord" accept="application/pdf" name="AcademicRecord" class="form-control">
+                </div>
+
+                <div class="col-sm-auto" id="UploadAcademicRecord">
+                    <button type="submit" class="btn btn-primary form-control UploadAcademicRecord">Upload Academic Record</button>
+                </div>
+
+            </div>
+        </form>
+
+        <form id="frmUploadID" asp-action="UploadId" asp-controller="JobSeeker" method="POST" enctype="multipart/form-data">
+            <div class="row">
+                <label asp-for="@Model.JobSeekerCreateIdViewModel.Id"></label>
+                <div class="col-md-4">
+                    <input asp-for="@Model.JobSeekerCreateIdViewModel.Id" accept="application/pdf" name="ID" class="form-control">
+                </div>
+
+                <div class="col-sm-auto" id="UploadId">
+                    <button type="submit" class="btn btn-primary form-control UploadId">Upload</button>
+                </div>
+
+            </div>
+        </form>
+    </div>
+</div>
+<!-- /Language-->
+
+@section Scripts{
+    <script src="~/js/Profile.js"></script>
+
+}

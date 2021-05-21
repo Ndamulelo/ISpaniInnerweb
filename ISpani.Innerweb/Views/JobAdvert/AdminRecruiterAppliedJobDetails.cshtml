@@ -1,0 +1,288 @@
+﻿
+@model ViewApplicantProfileViewModel;
+@{
+    ViewData["Title"] = "AdminRecruiterAppliedJobDetails";
+    Layout = "~/Views/Shared/_AdminRecruiterLayout.cshtml";
+
+    var role = HttpContextAccessor.HttpContext.Session.GetString("Role").Remove(0, 1);
+    role = role.Remove(role.Length - 1, 1);
+    var displayInviteDecline = HttpContextAccessor.HttpContext.Session.GetString("InviteDecline").Remove(0, 1);
+    displayInviteDecline = displayInviteDecline.Remove(displayInviteDecline.Length - 1, 1);
+
+    var gender = "";
+    var ethnicity = "";
+
+    if (Model.JobSeekerPersonalDetailsViewModel != null)
+    {
+        foreach (var item in Model.Genders)
+        {
+            if (item.Id.Equals(Model.JobSeekerPersonalDetailsViewModel.GenderId))
+            {
+                gender = item.Type;
+
+                break;
+            }
+        }
+    }
+
+    if (Model.JobSeekerPersonalDetailsViewModel != null)
+    {
+        foreach (var item in Model.Ethnicities)
+        {
+            if (item.Id.Equals(Model.JobSeekerPersonalDetailsViewModel.EthnicityId))
+            {
+                ethnicity = item.EthnicityType;
+
+                break;
+            }
+        }
+    }
+}
+
+<!-- Introduction -->
+<div class="card">
+    <div class="card-header header-elements-inline">
+        <h5 class="card-title font-weight-bold">Personal Details</h5>
+        <div class="header-elements">
+            @{
+                if (role.Equals("Recruiter"))
+                {
+                    if (displayInviteDecline.Equals("yes"))
+                    {
+
+                        <form method="post" asp-action="InviteForInterView" asp-controller="JobAdvert">
+
+                            <input type="hidden" name="jobAdvertId" id="AdvertIdInterview" value="@Model.JobAdvertId">
+                            <input type="hidden" name="jobSeekerId" id="SeekerIdInterview" value="@Model.JobSeekerPersonalDetailsViewModel.JobSeekerId">
+
+                            <button type="submit" id="Interview" class="btn btn-success mr-1">Interview</button>
+                        </form>
+
+                        <form method="post" asp-action="DeclineApplication" asp-controller="JobAdvert">
+
+                            <input type="hidden" name="jobAdvertId" id="AdvertIdInterview" value="@Model.JobAdvertId">
+                            <input type="hidden" name="jobSeekerId" id="SeekerIdInterview" value="@Model.JobSeekerPersonalDetailsViewModel.JobSeekerId">
+
+                            <button type="submit" id="Decline" class="btn btn-danger mr-1">Decline</button>
+                        </form>
+                    }
+                }
+            }
+            <div class="list-icons">
+                <a class="list-icons-item" data-action="collapse"></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body">
+
+        <p class="font-weight-bold">@Model.JobSeekerPersonalDetailsViewModel.FirstName @Model.JobSeekerPersonalDetailsViewModel.LastName</p>
+        <p>@gender - @ethnicity</p>
+        <div class="row">
+            <div class="col-sm-auto">
+                <i class="icon-mail5 mr-2"></i> <span><a href="mailto:@Model.JobSeekerPersonalDetailsViewModel.Email">@Model.JobSeekerPersonalDetailsViewModel.Email</a></span>
+            </div>
+
+            <div class="col-sm-auto">
+                <i class="icon-phone mr-2"></i> <span>@Model.JobSeekerPersonalDetailsViewModel.Phone</span>
+            </div>
+
+            <div class="col-sm-auto">
+                <i class="icon-location3 mr-2"></i> <span>@Model.JobSeekerPersonalDetailsViewModel.CityId</span>
+            </div>
+
+        </div>
+
+        <p class="mt-2">
+            @Model.JobSeekerPersonalDetailsViewModel.PersonalProfile
+
+        </p>
+
+    </div>
+</div>
+<!-- /Introduction-->
+<!-- Experience -->
+<div class="card">
+    <div class="card-header header-elements-inline">
+        <h5 class="card-title font-weight-bold">Work Experience</h5>
+        <div class="header-elements">
+            <div class="list-icons">
+                <a class="list-icons-item" data-action="collapse"></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body">
+
+        @{
+            if (Model.JobSeekerExperienceViewModel != null)
+            {
+                foreach (var item in Model.JobSeekerExperienceViewModel)
+                {
+
+
+                    <div>
+                        <p class="font-weight-bold">@item.JobTitle</p>
+                        @if (!item.IsCurrentCompany)
+                        {
+                            <p>@item.StartDate.Value.ToString("yyyy-MM-dd") - @item.EndDate.Value.ToString("yyyy-MM-dd")</p>
+                        }
+                        else
+                        {
+                            <p>Current Company</p>
+                        }
+                        <p>@item.CompanyName</p>
+                        <p>@item.JobCategory</p>
+                    </div>
+                }
+            }
+        }
+    </div>
+</div>
+<!-- /Experience-->
+<!-- Education -->
+<div class="card">
+    <div class="card-header header-elements-inline">
+        <h5 class="card-title font-weight-bold">Education</h5>
+        <div class="header-elements">
+            <div class="list-icons">
+                <a class="list-icons-item" data-action="collapse"></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body">
+        @{
+            if (Model.JobSeekerEducationViewModel != null)
+            {
+                foreach (var item in Model.JobSeekerEducationViewModel)
+                {
+                    <div>
+                        <p class="font-weight-bold">@item.Insitution</p>
+                        <p>@item.GraduationYear</p>
+                        <p>@item.FieldOfStudy</p>
+                        <p>@item.Qualification</p>
+                    </div>
+
+                }
+            }
+        }
+    </div>
+</div>
+<!-- /Education-->
+<!-- Skills -->
+<div class="card">
+    <div class="card-header header-elements-inline">
+        <h5 class="card-title font-weight-bold">Skills</h5>
+        <div class="header-elements">
+            <div class="list-icons">
+                <a class="list-icons-item" data-action="collapse"></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body">
+
+        @{
+            foreach (var item in Model.SkillLevel)
+            {
+
+                if (Model.JobSeekerSkillsViewModel != null)
+                {
+                    <h6 class="font-weight-bold">@item.Level</h6>
+
+                    foreach (var skill in Model.JobSeekerSkillsViewModel)
+                    {
+
+
+                        <p>@skill.SkillDescription</p>
+                    }
+                }
+            }
+        }
+
+    </div>
+</div>
+<!-- /Skills-->
+<!-- Language -->
+<div class="card">
+    <div class="card-header header-elements-inline">
+        <h5 class="card-title font-weight-bold">Skills</h5>
+        <div class="header-elements">
+            <div class="list-icons">
+                <a class="list-icons-item" data-action="collapse"></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body">
+
+        @{
+            foreach (var item in Model.LanguageLevel)
+            {
+
+                if (Model.JobSeekerLanguagesViewModel != null)
+                {
+                    <h6 class="font-weight-bold">@item.DifficultyLevel</h6>
+
+                    foreach (var language in Model.JobSeekerLanguagesViewModel)
+                    {
+
+
+                        <p>@language.LanguageName</p>
+                    }
+                }
+            }
+        }
+    </div>
+</div>
+<!-- /Language-->
+<!-- Attachements -->
+<div class="card">
+    <div class="card-header header-elements-inline">
+        <h5 class="card-title font-weight-bold">Attachements</h5>
+        <div class="header-elements">
+            <div class="list-icons">
+                <a class="list-icons-item" data-action="collapse"></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body">
+
+        <h6 class="font-weight-bold">CV</h6>
+            @if (Model.JobSeekerPersonalDetailsViewModel.CVUrl != null)
+            {
+                <a href="~/hustlersAttachments/cv/@Model.JobSeekerPersonalDetailsViewModel.CVUrl" target="_blank">View CV</a>
+            }
+            else
+            {
+                <a href="#">No CV</a>
+            }
+        <h6 class="font-weight-bold">Academic Record</h6>
+            @if (Model.JobSeekerPersonalDetailsViewModel.AcademicRecordUrl != null)
+            {
+                <a href="~/hustlersAttachments/academicRecord/@Model.JobSeekerPersonalDetailsViewModel.AcademicRecordUrl" target="_blank">View Academic Record</a>
+            }
+            else
+            {
+                <a href="#">No Academic Record</a>
+            }
+        <h6 class="font-weight-bold">ID</h6>
+            @if (Model.JobSeekerPersonalDetailsViewModel.IdUrl != null)
+            {
+                <a href="~/hustlersAttachments/id/@Model.JobSeekerPersonalDetailsViewModel.IdUrl" target="_blank">View ID</a>
+            }
+            else
+            {
+                <a href="#">No ID</a>
+            }
+    </div>
+</div>
+<!-- /Attachments-->
+
+@section Scripts{
+
+    <script src="~/js/JobAdvert.js"></script>
+
+}

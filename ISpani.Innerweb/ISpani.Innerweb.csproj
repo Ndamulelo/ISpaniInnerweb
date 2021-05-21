@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <UserSecretsId>abe79306-098c-46cf-8de4-3371fac3498d</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.7">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.5" />
+    <PackageReference Include="System.Drawing.Common" Version="5.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ISpaniInnerweb.Domain\ISpaniInnerweb.Domain.csproj" />
+    <ProjectReference Include="..\ISpaniInnerweb.Infrastructure\ISpaniInnerweb.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\hustlersAttachments\cv\" />
+    <Folder Include="wwwroot\hustlersAttachments\academicRecord\" />
+    <Folder Include="wwwroot\hustlersAttachments\id\" />
+    <Folder Include="wwwroot\hustlersAttachments\" />
+  </ItemGroup>
+
+</Project>

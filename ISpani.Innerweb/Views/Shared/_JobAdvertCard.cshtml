@@ -1,0 +1,56 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model List<ViewJobAdvertViewModel>;
+@{
+    var sessionValue = HttpContextAccessor.HttpContext.Session.GetString("Role").Remove(0, 1);
+    sessionValue = sessionValue.Remove(sessionValue.Length - 1, 1);
+}
+
+<div class="row mt-2">
+
+
+    @{ 
+
+        foreach (var item in Model)
+        {
+            <div class="col-md-6">
+                <!--Iterate To display search results-->
+                <!-- Basic card -->
+                <div class="card">
+                    <div class="card-header header-elements-inline">
+                        <h5 class="card-title">@item.Caption</h5>
+
+                    </div>
+
+                    <div class="card-body">
+                        <div class="card-subtitle mb-2 text-muted">@item.CompanyName</div>
+                        <p class="card-text">@item.Introduction</p>
+                        <i class="icon-location3 mr-2"></i><span class="mr-2">@item.City</span>
+                        <i class="icon-watch2 mr-2"></i><span class="mr-2">@item.ExperienceLevel</span>
+                        <i class="icon-wallet mr-2"></i><span class="mr-2">@item.JobType</span>
+                        <i class="icon-calendar mr-2"></i><span class="mr-2">@item.CreatedDate</span>
+                        <div class="row">
+                            <!--Remove this section to JobSeekers. Its for admin and Recruiter-->
+                            
+                            @if(sessionValue.Equals("JobSeeker"))
+                            {
+                                <div class="col-sm mt-2">
+                                <a asp-action="JobSeekerJobDetails" asp-controller="JobAdvert" asp-route-id="@item.JobAdvertId" class="btn btn-success auto">View</a>
+                                </div>
+                            }
+
+                            @if(sessionValue.Equals("Admin") || sessionValue.Equals("Recruiter")){
+                                <div class="col-sm mt-2">
+                                    <a asp-action="Edit" asp-controller="JobAdvert" asp-route-id="@item.JobAdvertId" class="btn btn-primary auto">Edit</a>
+                                </div>
+                            }
+                        </div>
+
+                    </div>
+                </div>
+                <!-- /basic card -->
+            </div>
+        }
+    }
+</div> <!--Job Advert Card Container-->

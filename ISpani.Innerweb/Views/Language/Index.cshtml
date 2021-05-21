@@ -1,0 +1,52 @@
+﻿
+@model AddLanguageViewModel;
+@{
+    ViewData["Title"] = "Create Language";
+    Layout = "~/Views/Shared/_JobSeekerLayout.cshtml";
+
+    IList<SelectListItem> languages = new List<SelectListItem>();
+
+    //Only display the skills that are not already assigned to the seeker
+    languages = new List<SelectListItem>();
+
+    foreach (var item in Model.Languages)
+    {
+
+        languages.Add(new SelectListItem(item.Name, item.Id));
+    }
+}
+
+<h1>Create Language</h1>
+
+<form action="" class="mb-2">
+
+    <div class="row">
+
+        <div class="col-md-2">
+            <label for="LanguageId">Language</label>
+
+            <select name="LanguageId" asp-items="@languages" class="form-control" id="LanguageId">
+            </select>
+
+        </div>
+
+        <div class="col-md-2">
+            <label for="LanguageLevelId">Level</label>
+
+            <select name="LanguageLevelId" asp-items="@(new SelectList(Model.LanguageLevels,"Id","DifficultyLevel"))" class="form-control" id="LanguageLevelId">
+            </select>
+
+        </div>
+
+        <div class="col-sm-auto">
+            <button class="mt-4 btn btn-primary form-control" id="CreateLanguage">Create Language</button>
+        </div>
+
+    </div>
+</form>
+
+@section Scripts{
+
+    <script src="~/js/Language.js"></script>
+
+}

@@ -1,0 +1,62 @@
+﻿@model EditRecruiterViewModel;
+@{
+    ViewData["Title"] = "Create Recruiter";
+    Layout = "~/Views/Shared/_AdminRecruiterLayout.cshtml";
+
+    IList<SelectListItem> recruiterCompany = new List<SelectListItem>();
+
+    foreach (var item in Model.Companies)
+    {
+
+        recruiterCompany.Add(new SelectListItem(item.CompanyName, item.Id, item.Id.Equals(Model.CompanyId) ? true : false));
+    }
+}
+
+
+<form method="POST" asp-action="Edit" asp-route-id ="@Model.RecruiterId" asp-controller="Recruiter">
+    
+    @{ if (TempData["RecruiterUpdateMessage"] != null)
+        {
+            <div class="alert alert-success">@TempData["RecruiterUpdateMessage"]</div>
+        }
+    }
+
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <div class="form-row">
+        <div class="col-md-4 mb-3">
+            <label asp-for="FirstName">First name</label>
+            <input type="text" name="FirstName" class="form-control" value="@Model.FirstName">
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <label asp-for="LastName">Last name</label>
+            <input type="text" name="LastName" class="form-control" value="@Model.LastName">
+        </div>
+
+    </div>
+
+    <div class="form-row">
+        <div class="col-md-4 mb-3">
+            <label asp-for="Phone">Phone</label>
+            <input type="text" name="Phone" class="form-control" value="@Model.Phone">
+        </div>
+
+        <div class="col-md-4 mb-3">
+
+            <label asp-for="CompanyId">Company</label>
+            <select name="CompanyId" asp-items="@recruiterCompany"  class="custom-select form-control">
+            </select>
+        </div>
+    </div>
+
+    <div class="form-row">
+
+        <div class="col-md-4">
+            <button class="btn btn-primary" type="submit">Update</button>
+        </div>
+
+    </div>
+
+</form>
+
+

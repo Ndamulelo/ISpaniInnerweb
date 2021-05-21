@@ -1,0 +1,68 @@
+﻿
+@model CreateRecruiterViewModel;
+@{
+    ViewData["Title"] = "Edit Recruiter";
+    Layout = "~/Views/Shared/_AdminRecruiterLayout.cshtml";
+}
+
+<form method="POST" asp-action="Create" asp-controller="Recruiter">
+
+    @if (TempData["CreateRecruiter"] != null)
+    {
+        <div class="alert alert-success" role="alert">@TempData["CreateRecruiter"]</div>
+    }
+
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <div class="form-row">
+        <div class="col-md-4 mb-3">
+            <label asp-for="FirstName">First name</label>
+            <input type="text" name="FirstName" class="form-control">
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <label asp-for="LastName">Last name</label>
+            <input type="text" name="LastName" class="form-control" />
+        </div>        
+        
+        <div class="col-md-4 mb-3">
+            <label asp-for="Email">Email</label>
+            <input type="text" name="Email" class="form-control" />
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="col-md-4 mb-3">
+            <label asp-for="Phone">Phone</label>
+            <input type="number" name="Phone" minLength="10" maxlength="10" class="form-control">
+        </div>
+
+        <div class="col-md-4 mb-3">
+
+            <label for="CompanyId">Company</label>
+            <select ap-for="CompanyId" asp-items="@(new SelectList(Model.Companies,"Id","CompanyName"))" name="CompanyId" class="custom-select form-control">
+            </select>
+        </div>
+    </div>
+
+    <div class="form-row">
+
+        <div class="col-md-4 mb-3">
+
+            <label asp-for="Password">Password</label>
+            <input type="password" name="Password" class="form-control">
+
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <label asp-for="ConfirmPassword">Confirm Password</label>
+            <input type="password" name="ConfirmPassword" class="form-control">
+        </div>
+
+        <div class="col-md-4 mt-4">
+            <button class="btn btn-primary" type="submit">Submit</button>
+        </div>
+
+    </div>
+
+</form>
+

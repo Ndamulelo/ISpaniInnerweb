@@ -1,0 +1,93 @@
+﻿
+@{
+    Layout = "_MasterLayout";
+    var username = HttpContextAccessor.HttpContext.Session.GetString("Username").Remove(0,1);
+    username = username.Remove(username.Length - 1,1);
+}
+
+
+    <!-- Page header -->
+    <div class="page-header page-header-dark">
+
+        <!-- Main navbar -->
+        <div class="navbar navbar-expand-md navbar-dark border-transparent">
+            <div class="navbar-brand wmin-0 mr-5">
+                <a href="../full/index.html">
+                    <!--<img src="~/logo.png" alt="" height="55" width="55">-->
+                </a>
+            </div>
+            <div class="collapse navbar-collapse" id="navbar-mobile">
+
+                <ul class="navbar-nav ml-auto">
+
+                    <li class="nav-item dropdown dropdown-user">
+                        <a href="#" class="navbar-nav-link d-flex align-items-center dropdown-toggle" data-toggle="dropdown">
+                            <img src="../../../../global_assets/images/image.png" class="rounded-circle mr-2" height="34" alt="">
+                            <span>@username</span>
+                        </a>
+
+                        <div class="dropdown-menu dropdown-menu-right">
+                            <a asp-action="Profile" asp-controller="JobSeeker" class="dropdown-item"><i class="icon-user-plus"></i> My profile</a>
+                            <a asp-action="ChangePassword" asp-controller="User" class="dropdown-item"><i class="icon-cog5"></i> Change Password</a>
+                            <div class="dropdown-divider"></div>
+                            <a asp-action="SignOut" asp-controller="User" class="dropdown-item"><i class="icon-switch2"></i> Logout</a>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <!-- /main navbar -->
+        <!-- Secondary navbar -->
+        <div class="navbar navbar-expand-md navbar-dark border-top-0">
+            <div class="text-center d-md-none w-100">
+                <button type="button" class="navbar-toggler dropdown-toggle" data-toggle="collapse" data-target="#navbar-navigation">
+                    <i class="icon-unfold mr-2"></i>
+                    Navigation
+                </button>
+            </div>
+
+            <div class="navbar-collapse collapse" id="navbar-navigation">
+                <ul class="navbar-nav navbar-nav-highlight">
+                    <li class="nav-item">
+                        <a asp-action="Index" asp-controller="JobSeeker" class="navbar-nav-link">
+                            <i class="icon-home4 mr-2"></i>
+                            Dashboard
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a asp-action="JobApplicationHistory" asp-controller="JobSeeker" class="navbar-nav-link">
+                            <i class="icon- mr-2"></i>
+                            My Jobs
+                        </a>
+                    </li>
+
+                </ul>
+
+            </div>
+        </div>
+        <!-- /secondary navbar -->
+
+    </div>
+    <!-- /page header -->
+    <!-- Page content -->
+    <div class="page-content">
+
+        <!-- Main content -->
+        <div class="content-wrapper">
+
+            <!-- Content area -->
+            <div class="content">
+
+                @RenderBody();
+
+                @if(IsSectionDefined("Scripts"))
+                { @RenderSection("Scripts",required: true) }
+            </div>
+            <!-- /content area -->
+
+        </div>
+        <!-- /main content -->
+
+    </div>
+    <!-- /page content -->

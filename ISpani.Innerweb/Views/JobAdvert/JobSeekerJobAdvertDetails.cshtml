@@ -1,0 +1,189 @@
+﻿
+@model JobSeekerJobDetailsViewModel;
+@{
+    ViewData["Title"] = "Job Advert Details";
+    Layout = "~/Views/Shared/_JobSeekerLayout.cshtml";
+}
+
+<!-- Card for main heading with Apply Now Button -->
+<div class="card">
+    <div class="card-header header-elements-inline">
+        <h5 class="card-title font-weight-bold">@Model.Caption</h5>
+        <div class="header-elements">
+            <div class="list-icons">
+                <a class="list-icons-item" data-action="collapse"></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h5 class="title text-muted">@Model.Company</h5>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-auto">
+                <i class="icon-location3 mr-2"></i> <span>@Model.City</span>
+            </div>
+
+            <div class="col-sm-auto">
+                <i class="icon-wallet mr-2"></i> <span>@Model.ExperienceLevel</span>
+            </div>
+
+            <div class="col-sm-auto">
+                <i class="icon-watch2 mr-2"></i> <span>@Model.JobType</span>
+            </div>
+
+            <div class="col-sm-auto">
+                <i class="icon-calendar mr-2"></i> <span>Published: @Model.CreatedDate.Value.ToString("yyyy-mm-dd")</span>
+            </div>
+        </div>
+
+        <form asp-action="ApplyForJob" asp-controller="JobAdvert" method="post">
+            <div class="form-row">
+                <input type="hidden" name="CompanyId" id="CompanyId" value="@Model.CompanyId">
+                <input type="hidden" name="JobSeekerId" id="JobSeekerId">
+                <input type="hidden" name="RecruiterId" id="RecruiterId" value="@Model.RecruiterId">
+                <input type="hidden" name="JobAdvertId" id="JobAdvertId" value="@Model.JobAdvertId">
+                <div class="col-sm-4 mt-3">
+                    @{
+                        if (Model.IsAlreadyAppliedBySeeker)
+                        {
+                            <button type="submit" disabled class="btn btn-warning form-control">Already Applied</button>
+                        }
+                        else
+                        {
+                            <button type="submit" class="btn btn-success form-control" id="Apply">Apply Now</button>
+                        }
+                    }
+                </div>
+            </div>
+            @if (TempData["Apply"] != null)
+            {
+                <div class="alert alert-success" role="alert">@TempData["Apply"]</div>
+            }
+        </form>
+    </div>
+</div>
+<!-- /Card for main heading with Apply Now Button-->
+<!-- Introduction -->
+<div class="card">
+    <div class="card-header header-elements-inline">
+        <h5 class="card-title font-weight-bold">Introduction</h5>
+        <div class="header-elements">
+            <div class="list-icons">
+                <a class="list-icons-item" data-action="collapse"></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <p class="card-text">
+            @Model.Introduction
+        </p>
+    </div>
+</div>
+<!-- /Introduction-->
+<!-- Duties -->
+<div class="card">
+    <div class="card-header header-elements-inline">
+        <h5 class="card-title font-weight-bold">Duties & Responsibilities</h5>
+        <div class="header-elements">
+            <div class="list-icons">
+                <a class="list-icons-item" data-action="collapse"></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <ul>
+            @{ foreach (var item in Model.Duties)
+                {
+
+                    <li>@item</li>
+                }
+            }
+        </ul>
+    </div>
+</div>
+<!-- /Duties-->
+<!-- Desired Experience & Qualification -->
+<div class="card">
+    <div class="card-header header-elements-inline">
+        <h5 class="card-title font-weight-bold">Desired Experience & Qualification</h5>
+        <div class="header-elements">
+            <div class="list-icons">
+                <a class="list-icons-item" data-action="collapse"></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <h9 class="title fw-bold">
+            <h5>Experience</h5>
+            <ul class="fw-normal">
+
+                @{
+                    foreach (var item in Model.Experience)
+                    {
+                        <li>@item</li>
+                    }
+
+                }
+            </ul>
+
+            <h9 class="title fw-bold">
+                <h5>Qualifications</h5>
+                <ul class="fw-normal">
+                    @{
+                        foreach (var item in Model.Qualifications)
+                        {
+                            <li>@item</li>
+                        }
+
+                    }
+                </ul>
+
+    </div>
+</div>
+<!-- /Desired Experience & Qualification-->
+<!-- Remuneration & Package -->
+<div class="card">
+    <div class="card-header header-elements-inline">
+        <h5 class="card-title font-weight-bold">Remuneration & Package</h5>
+        <div class="header-elements">
+            <div class="list-icons">
+                <a class="list-icons-item" data-action="collapse"></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body">
+
+        <p>R @Model.SalaryFrom to R @Model.SalaryTo P\M</p>
+    </div>
+</div>
+
+<!-- /Recruiter And Company Information-->
+
+<div class="card">
+    <div class="card-header header-elements-inline">
+        <h5 class="card-title font-weight-bold">Recruiter Information</h5>
+        <div class="header-elements">
+            <div class="list-icons">
+                <a class="list-icons-item" data-action="collapse"></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-body">
+
+        <span class="font-weight-bold">Recruiter Name: </span> <p>@Model.Recruiter</p>
+        <span class="font-weight-bold">Recruiter Email: </span> <p>@Model.RecruiterEmail</p>
+        <span class="font-weight-bold">Recruiter Phone: </span> <p>@Model.RecruiterPhone</p>
+
+    </div>
+</div>
+<!-- /Remuneration & Package-->

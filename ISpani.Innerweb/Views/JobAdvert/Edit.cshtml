@@ -1,0 +1,138 @@
+﻿@model EditJobAdvertViewModel;
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Views/Shared/_AdminRecruiterLayout.cshtml";
+
+    IList<SelectListItem> categories = new List<SelectListItem>();
+    IList<SelectListItem> cities = new List<SelectListItem>();
+    IList<SelectListItem> jobTypes = new List<SelectListItem>();
+    IList<SelectListItem> experienceLevels = new List<SelectListItem>();
+
+    foreach (var item in Model.Cities)
+    {
+
+        cities.Add(new SelectListItem(item.Name, item.Id, item.Id.Equals(Model.CityId) ? true : false));
+    }
+
+    foreach (var item in Model.JobCategories)
+    {
+
+        categories.Add(new SelectListItem(item.Name, item.Id, item.Id.Equals(Model.JobCategoryId) ? true : false));
+    }    
+    
+    foreach (var item in Model.JobTypes)
+    {
+
+        jobTypes.Add(new SelectListItem(item.Description, item.Id, item.Id.Equals(Model.JobTypeId) ? true : false));
+    }    
+    
+    foreach (var item in Model.ExperienceLevels)
+    {
+
+        experienceLevels.Add(new SelectListItem(item.Description, item.Id, item.Id.Equals(Model.ExperienceLevelId) ? true : false));
+    }
+}
+
+<h5 class="page-title"> Edit Job Advert</h5>
+<form asp-action="Edit" asp-controller="JobAdvert" method="POST" asp-route-id="@Model.JobAdvertId">
+    @if (TempData["AdvertEdit"] != null)
+    {
+        <div class="alert alert-success" role="alert">@TempData["AdvertEdit"]</div>
+    }
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <div class="form-row">
+        <div class="col-md-4 mb-3">
+            <label asp-for="Introduction">Introduction</label>
+            <textarea name="Introduction" class="form-control" rows="3">@Model.Introduction</textarea>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <label asp-for="Qualifications">Qualifications</label>
+            <textarea name="Qualifications" class="form-control" rows="3">@Model.Qualifications</textarea>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <label asp-for="Experience">Experience</label>
+            <textarea name="Experience" class="form-control" rows="3">@Model.Experience</textarea>
+        </div>
+
+    </div>
+
+    <div class="form-row">
+
+        <div class="col-md-4 mb-3">
+            <label asp-for="Duties">Duties</label>
+            <textarea name="Duties" class="form-control" rows="3">@Model.Duties</textarea>
+        </div>
+
+
+
+        <div class="col-md-4 mb-3">
+            <label asp-for="SalaryFrom">Salary From p/m</label>
+            <input type="number" name="SalaryFrom" class="form-control" min="0" max="1000000" placeholder="30000" value="@Model.SalaryFrom">
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <label asp-for="SalaryTo">Salary To p/m</label>
+            <input type="number" name="SalaryTo" class="form-control" min="1" max="1000000" placeholder="80000" value="@Model.SalaryTo">
+        </div>
+
+    </div>
+
+    <div class="form-row">
+
+        <div class="col-md-4 mb-3">
+            <label asp-for="Caption">Caption</label>
+            <input type="text" name="Caption" class="form-control" placeholder="Software Engineer" value="@Model.Caption">
+        </div>
+
+        <div class="col-md-4 mb-3">
+
+            <label asp-for="ExperienceLevelId">ExperienceLevel</label>
+            <select asp-for="ExperienceLevelId" asp-items="@experienceLevels" class="custom-select form-control">
+            </select>
+        </div>
+
+        <div class="col-md-4 mb-3">
+
+            <label asp-for="JobCategoryId">JobCategory</label>
+            <select asp-for="JobCategoryId" asp-items="@categories" class="custom-select form-control">
+            </select>
+        </div>
+
+        <div class="col-md-4 mb-3">
+
+            <label asp-for="JobTypeId">JobType</label>
+            <select asp-for="JobTypeId" asp-items="@jobTypes" class="custom-select form-control">
+            </select>
+        </div>
+
+        <div class="col-md-4 mb-3">
+
+            <label asp-for="CityId">City</label>
+            <select asp-for="CityId" asp-items="cities" class="custom-select form-control">
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="StartDate">StartDate</label>
+
+            <input type="date" name="StartDate" class="form-control" placeholder="2020-03-03" min="@DateTime.Now.ToString("yyyy-MM-dd")" value="@Model.StartDate.ToString("yyyy-MM-dd")">
+
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="EndDate">EndDate</label>
+
+            <input type="date" asp-for="EndDate" class="form-control" min="@DateTime.Now.ToString("yyyy-MM-dd")" max="2022-01-01" value="@Model.EndDate.ToString("yyyy-MM-dd")">
+
+        </div>
+
+        <div class="col-md-4 mt-4">
+            <button class="btn btn-primary" type="submit">Update</button>
+        </div>
+
+    </div>
+
+</form>
+
