@@ -6,7 +6,7 @@
     var sessionValues = HttpContextAccessor.HttpContext.Session;
     var username = sessionValues.GetString("Username").Remove(0, 1);
     username = username.Remove(username.Length-1, 1);
-    var controller = "Recruiter";
+    var controller = "Admin";
 
     if(!UserRole.Equals("Admin"))
     {
@@ -22,8 +22,8 @@
 
     <div class="navbar navbar-expand-md navbar-dark border-transparent">
         <div class="navbar-brand wmin-0 mr-5">
-            <a href="../full/index.html" class="d-inline-block">
-                <!--<img src="~/logo.png" alt="" height="55" width="55" >-->
+            <a asp-action="Index" asp-controller="@controller" class="d-inline-block">
+                <img src="~/logo-i.png" alt="Logo" >
             </a>
         </div>
         
