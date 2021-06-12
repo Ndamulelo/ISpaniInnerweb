@@ -12,7 +12,7 @@
         onCompanyChange: function onCompanyChange(event) {
             this.selected = event.target.value;
             //Call and populate recruiters based on the selected option
-            axios.get("https://localhost:5001/Api/GetByCompanyId/" + this.selected).then(response => {
+            axios.get("http://localhost:5000/Api/GetByCompanyId/" + this.selected).then(response => {
                 this.companyRecruiterList = response.data
                 //Clear an array every time a new company is selected
                 this.options = [];
