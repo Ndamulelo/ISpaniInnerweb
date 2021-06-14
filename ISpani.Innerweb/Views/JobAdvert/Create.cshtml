@@ -86,7 +86,7 @@
             <select name="CityId" asp-items="@(new SelectList(Model.Cities, "Id", "Name"))" class="custom-select form-control">
             </select>
         </div>
-        
+
         @{
             if (role.Equals("Admin"))
             {
@@ -94,7 +94,7 @@
                 <div class="col-md-4 mb-3">
 
                     <label asp-for="CompanyId">Company</label>
-                    <select v-on:change="onCompanyChange($event)" name="CompanyId" asp-items="@(new SelectList(Model.Companies, "Id", "CompanyName"))" class="custom-select form-control">
+                    <select name="CompanyId" id="CompanyId" asp-items="@(new SelectList(Model.Companies, "Id", "CompanyName"))" class="custom-select form-control">
                         <option value="0" selected> Choose Company</option>
                     </select>
                 </div>
@@ -102,11 +102,8 @@
                 <div class="col-md-4 mb-3">
 
                     <label asp-for="RecruiterId">Recruiter</label>
-                    <select name="RecruiterId" class="custom-select form-control">
+                    <select name="RecruiterId" id="RecruiterId" class="custom-select form-control">
                         <option value="0" selected> Choose Recruiter</option>
-                        <option v-for="option in options" v-bind:value="option.value">
-                            {{ option.text }}
-                        </option>
                     </select>
                 </div>
             }
@@ -133,5 +130,37 @@
 
 </form>
 @section Scripts{
-    <script src="~/js/testvue.js"></script>
+    <script>
+        $(document).ready(function () {
+
+            var companyId = "";
+            $("select#CompanyId").change(function () {
+                companyId = $(this).children("option:selected").val();
+
+                //Clear options everytime a new company is clicked
+                $('#RecruiterId').empty()
+
+                $.ajax({
+                    type: "get",
+                    url: 'GetByCompanyId',
+                    data: { "companyId": companyId },
+                    success: function (response) {
+                        console.log(response);
+                         
+                        //populate recruiters dropdown with returned data
+                        for (var index = 0; index < response.length; index++) {
+                            $('#RecruiterId').append('<option value="' + response[index].id + '">' + response[index].firstName + '</option>');
+                            console.log(response[0].id + " : " + index);
+                        }
+                        
+
+                    }
+                });
+
+            });
+
+        });
+
+       
+    </script>
 }

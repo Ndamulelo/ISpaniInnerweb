@@ -82,9 +82,12 @@ namespace ISpaniInnerweb.Controllers
                 ModelState.AddModelError("StartDate", "Start Date field cannot be greater than End Date field");
             }
 
-            if(createJobAdvertViewModel.RecruiterId.Equals("0") || createJobAdvertViewModel.CompanyId.Equals("0"))
+            if (!string.IsNullOrEmpty(createJobAdvertViewModel.RecruiterId))
             {
-                ModelState.AddModelError("CompanyId", "Select a company and relevant recruiter");
+                if (createJobAdvertViewModel.RecruiterId.Equals("0") || createJobAdvertViewModel.CompanyId.Equals("0"))
+                {
+                    ModelState.AddModelError("CompanyId", "Select a company and relevant recruiter");
+                }
             }
 
             if (ModelState.IsValid)
@@ -461,7 +464,6 @@ namespace ISpaniInnerweb.Controllers
 
         // Restful api
         [HttpGet]
-        [Route("Api/GetByCompanyId/{companyId}")]
         public IActionResult GetByCompanyId(string companyId)
         {
             var recruiters =  _recruiterService.GetByCompanyId(companyId);
