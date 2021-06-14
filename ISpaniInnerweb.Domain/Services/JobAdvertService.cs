@@ -189,31 +189,33 @@ namespace ISpaniInnerweb.Domain.Services
         public IList<ViewJobAdvertViewModel> GetAllByJobSeeker(string jobCategoryId = null,string jobCityId = null)
         {
             var jobAdverts = jobAdvertRepository.Get();
-
+            //jobAdverts = jobAdverts.Where(x => x.EndDate.Value.Date
             //Loop through adverts and assign into ViewJobAdvertViewModel
+            //var dateDiff = (jobAdverts[4].EndDate.Value.Date - DateTime.Now.Date).Days;
 
             if (!String.IsNullOrEmpty(jobCategoryId))
             {
                 if(jobCategoryId.Equals("All") && jobCityId.Equals("All"))
                 {
+                    jobAdverts = jobAdverts.Where(x =>(x.EndDate.Value.Date - DateTime.Now.Date).Days > -1).ToList();
                     return ProcessAdvert(jobAdverts);
                 }
                 else if(jobCategoryId.Equals("All") && !jobCityId.Equals("All"))
                 {
                     jobAdverts = jobAdverts.Where(x=>
-                                x.CityId.Equals(jobCityId)).ToList();
+                                x.CityId.Equals(jobCityId) && (x.EndDate.Value.Date - DateTime.Now.Date).Days > -1).ToList();
                     return ProcessAdvert(jobAdverts);
                 }
                 else if(!jobCategoryId.Equals("All") && jobCityId.Equals("All"))
                 {
                     jobAdverts = jobAdverts.Where(
-                                    x => x.JobCategoryId.Equals(jobCategoryId)).ToList();
+                                    x => x.JobCategoryId.Equals(jobCategoryId) && (x.EndDate.Value.Date - DateTime.Now.Date).Days > -1).ToList();
                     return ProcessAdvert(jobAdverts);
                 }
                 //For the first time when a page loads
                 jobAdverts = jobAdverts.Where(
                             x => x.JobCategoryId.Equals(jobCategoryId) &&
-                            x.CityId.Equals(jobCityId)
+                            x.CityId.Equals(jobCityId) && (x.EndDate.Value.Date - DateTime.Now.Date).Days > -1 
                             ).ToList();
 
                 //Call process method here
@@ -221,6 +223,7 @@ namespace ISpaniInnerweb.Domain.Services
             }
             else
             {
+                jobAdverts = jobAdverts.Where(x => (x.EndDate.Value.Date - DateTime.Now.Date).Days > -1).ToList();
                 return ProcessAdvert(jobAdverts);
             }
         }
