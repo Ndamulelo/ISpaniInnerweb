@@ -1,6 +1,7 @@
 ﻿using ISpaniInnerweb.Domain.Entities;
 using ISpaniInnerweb.Domain.Interfaces.Helpers;
 using ISpaniInnerweb.Domain.Interfaces.Services;
+using ISpaniInnerweb.Domain.Interfaces.Services.Communication;
 using ISpaniInnerweb.Domain.Models.JobAdvertViewModel;
 using ISpaniInnerweb.Domain.Models.JobSeekerViewModel;
 using ISpaniInnerweb.Helpers;
@@ -16,6 +17,7 @@ namespace ISpaniInnerweb.Controllers
 {
     public class JobAdvertController : Controller
     {
+        private readonly IEmailService _emailService;
         private readonly ICompanyService _companyService;
         private readonly IJobAdvertService _jobAdvertService;
         private readonly IJobSeekerService _jobSeekerService;
@@ -34,8 +36,10 @@ namespace ISpaniInnerweb.Controllers
 
         public JobAdvertController(ICompanyService companyService, IJobAdvertService jobAdvertService, IExperienceLevelService experienceLevelService,
             IProvinceService provinceService, IRecruiterService recruiterService, IJobCategoryService jobCategoryService,IJobTypeService jobTypeService,
-            IStringManipulator stringManipulator, ICityService cityService, IJobSeekerService jobSeekerService, IWebHostEnvironment webHostEnvironment)
+            IStringManipulator stringManipulator, ICityService cityService, IJobSeekerService jobSeekerService, IWebHostEnvironment webHostEnvironment,
+            IEmailService emailService)
         {
+            _emailService = emailService;
             _companyService = companyService;
             _jobSeekerService = jobSeekerService;
             _provinceService = provinceService;
@@ -140,6 +144,31 @@ namespace ISpaniInnerweb.Controllers
             return View();
         }
 
+        [HttpGet]
+        public IActionResult ScheduleInterview(string sekkerId, string advertId) 
+        {
+            return View(new Interview { JobSeekerId = sekkerId, JobAdvertId = advertId });
+        }        
+        
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult ScheduleInterview(Interview interview) 
+        {
+            var scheduleInterview = _jobSeekerService.GetJobSeekerApplicationByAdvertId(interview.JobAdvertId,interview.JobSeekerId);
+                
+            _jobSeekerService.ScheduleInterview(scheduleInterview, interview);
+            //Update status on JobApplication Table
+            _jobAdvertService.InviteToInverView(interview.JobAdvertId, interview.JobSeekerId);
+
+            return View("InterviewInviteSuccess"); 
+        }
+
+        [HttpGet]
+        public IActionResult Interviews()
+        {
+            return View(_jobSeekerService.GetInterviews(HttpContext.Session.Get<string>("RecruiterId")));
+        }
+
         // GET: For Admin and Recruiter
         [HttpGet]
         public ActionResult JobAdvertList(string jobTypeId, string companyId, DateTime dateFrom, DateTime dateTo, string jobCategoryId)
@@ -189,6 +218,7 @@ namespace ISpaniInnerweb.Controllers
                 jobSeekerJobDetailsViewModel.CompanyId,
                 HttpContext.Session.Get<string>("JobSeekerId")
                 );
+            TempData["Apply"] = "Job Applied";
             TempData["Apply"] = "Job Applied";
 
             var jobDetails = _jobAdvertService.GetDetailedJob(jobSeekerJobDetailsViewModel.JobAdvertId);
@@ -352,6 +382,7 @@ namespace ISpaniInnerweb.Controllers
 
             };
 
+            //Clipboard.SetText("Test");
             viewApplicantProfileViewModel.JobSeekerPersonalDetailsViewModel.CityId = 
             _cityService.Get(viewApplicantProfileViewModel.JobSeekerPersonalDetailsViewModel.CityId).Name;
             return View("AdminRecruiterAppliedJobDetails",viewApplicantProfileViewModel);

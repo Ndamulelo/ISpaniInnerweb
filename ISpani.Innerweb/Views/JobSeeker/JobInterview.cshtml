@@ -1,0 +1,60 @@
+﻿
+@model List<ViewInterviewViewModel>;
+@{
+    ViewData["Title"] = "JobApplicationHistory";
+    Layout = "~/Views/Shared/_JobSeekerLayout.cshtml";
+}
+
+<!-- Basic table -->
+<div class="card">
+    <div class="card-header header-elements-inline">
+        <h5 class="card-title">Job Interview History</h5>
+    </div>
+
+    <!--<div class="header-elements text-right mr-2">
+
+        <a asp-action="ExportJobHistoryReport" asp-controller="JobSeeker" class="btn btn-success">Export</a>
+
+    </div>-->
+
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Company</th>
+                    <th>Job</th>
+                    <th>Date</th>
+                    <th>Time</th><!--Company Job Date Time Address Phone Email Interviewer-->
+                    <th>Address</th>
+                    <th>Contact Person</th>
+                    <th>Recruiter</th>
+                    <th>Type</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @{
+
+                    if (Model != null)
+                    {
+                        foreach (var item in Model)
+                        {
+                           
+                                <tr>
+                                    <td>@item.Company</td>
+                                    <td>@item.Job</td>
+                                    <td>@item.InterviewDate.Value.ToString("yyyy-MM-dd")</td>
+                                    <td>@item.Time</td>
+                                    <td>@item.Address</td>
+                                    <td>@item.Phone <a href="mailto:@item.Email">@item.Email</a></td>
+                                    <td>@item.Applicant</td>
+                                    <td>@item.InterviewType</td>
+                                </tr>
+                        }
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<!-- /basic table -->

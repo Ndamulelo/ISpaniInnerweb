@@ -22,7 +22,7 @@ namespace ISpaniInnerweb.Domain.Services
             var emailSettings = this.emailSettings;
 
             var mailMessage = new MimeMessage();
-            mailMessage.From.Add(new MailboxAddress("support@recruitmentJob.co.za", "9999ndamu@gmail.com"));
+            mailMessage.From.Add(new MailboxAddress("support@ispaniinnerweb.co.za", "9999ndamu@gmail.com"));
             mailMessage.To.Add(new MailboxAddress(to, to));
             mailMessage.Subject = subject;
             mailMessage.Body = new TextPart("Plain")

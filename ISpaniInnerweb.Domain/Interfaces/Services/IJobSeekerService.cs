@@ -1,4 +1,5 @@
 ﻿using ISpaniInnerweb.Domain.Entities;
+using ISpaniInnerweb.Domain.Models;
 using ISpaniInnerweb.Domain.Models.AdminViewModel;
 using ISpaniInnerweb.Domain.Models.JobSeekerViewModel;
 using ISpaniInnerweb.Domain.Models.RecruiterViewModel;
@@ -8,7 +9,11 @@ namespace ISpaniInnerweb.Domain.Interfaces.Services
 {
     public interface IJobSeekerService
     {
+        IList<ViewInterviewViewModel> GetInterviews(string recruiterId);
+        IList<ViewInterviewViewModel> GetSeekersInterviews(string seekerId);
+        void ScheduleInterview(ScheduleInterviewViewModel scheduleInterviewViewModel, Interview interview);
         JobSeeker Get(string id);
+        ScheduleInterviewViewModel GetJobSeekerApplicationByAdvertId(string advertId, string seekerId);
         IList<JobSeekerRecruiterSearch> GetJobSeekerBySkillAndCity(string skillId = null, string cityId = null);
         bool IsJobSeekerSkillExisting(string skillId, string jobSeekerId);
         bool IsJobSeekerLanguageExisting(string languageId, string jobSeekerId);

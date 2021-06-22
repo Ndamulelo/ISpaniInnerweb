@@ -169,6 +169,13 @@ namespace ISpaniInnerweb.Controllers
             return Json(response);
         }
 
+        [HttpGet]
+        public IActionResult JobInterviews()
+        {
+
+            return View("JobInterview",_jobSeekerService.GetSeekersInterviews(HttpContext.Session.Get<string>("JobSeekerId")));
+        }
+
         public JsonResult UpdateExperience(JobSeekerExperienceViewModel jobSeekerExperienceViewModel)
         {
             //jobSeekerPersonalDetailsViewModel.JobSeekerId = HttpContext.Session.Get<string>("JobSeekerId");

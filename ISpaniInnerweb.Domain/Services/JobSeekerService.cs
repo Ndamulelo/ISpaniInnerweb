@@ -1,6 +1,7 @@
 ﻿using ISpaniInnerweb.Domain.Entities;
 using ISpaniInnerweb.Domain.Interfaces.Repositories;
 using ISpaniInnerweb.Domain.Interfaces.Services;
+using ISpaniInnerweb.Domain.Models;
 using ISpaniInnerweb.Domain.Models.AdminViewModel;
 using ISpaniInnerweb.Domain.Models.JobSeekerViewModel;
 using ISpaniInnerweb.Domain.Models.RecruiterViewModel;
@@ -37,8 +38,9 @@ namespace ISpaniInnerweb.Domain.Services
         IRepository<WorkExperience> workExperienceRepository;
         IRepository<JobCategory> jobCategoryRepository;
         IRepository<Attachment> attachmentRepository;
-        //IRepository<Education> educationRepository;
-
+        //IRepository<Interview> interviewRepository;
+        IRepository<Interview> interviewRepository;
+        IRepository<Interview> _interviewRepository;
         ILogger<JobSeekerService> logger;
 
         public JobSeekerService(ILogger<JobSeekerService> logger, IRepository<User> userRepository, IRepository<Recruiter> recruiterRepository,
@@ -47,8 +49,11 @@ namespace ISpaniInnerweb.Domain.Services
             IRepository<SkillLevel> skillLevelRepository, IRepository<Language> languageRepository, IRepository<LanguageLevel> languageLevelRepository,
             IRepository<JobSeekerLanguages> jobSeekerLanguagesRepository, IRepository<Education> educationRepository, IRepository<Qualification> qualificationRepository,
             IRepository<WorkExperience> workExperienceRepository, IRepository<JobCategory> jobCategoryRepository, IRepository<JobSeekerSkills> jobSeekerSkillsRepository,
-            IRepository<JobSeekerJobApplications> jobSeekerJobApplications, ICompanyService companyService,IJobAdvertService jobAdvertService, IRepository<Attachment> attachmentRepository)
+            IRepository<JobSeekerJobApplications> jobSeekerJobApplications, ICompanyService companyService,IJobAdvertService jobAdvertService, IRepository<Attachment> attachmentRepository,
+             IRepository<Interview> interviewRepo)
         {
+            //this.interviewRepository = interviewRepository;
+            _interviewRepository = interviewRepo;
             this.userRepository = userRepository;
             this.jobSeekerRepository = jobSeekerRepository;
             this.addressRepository = addressRepository;
@@ -396,6 +401,53 @@ namespace ISpaniInnerweb.Domain.Services
             return null;
         }
 
+        public ScheduleInterviewViewModel GetJobSeekerApplicationByAdvertId(string advertId, string seekerId)
+        {
+            var jobApplication = jobSeekerJobApplications.FindByCondition
+                (s => s.JobSeekerId.Equals(seekerId) && s.JobAdvertId.Equals(advertId)).FirstOrDefault();
+
+            var company = companyService.Get(jobApplication.CompanyId);
+            var address = addressRepository.Get(company.AddressId);
+            var recruiter = recruiterRepository.Get(jobApplication.RecruiterId);
+            var jobSeeker = jobSeekerRepository.Get(seekerId);
+            var jobSeekerEmail = userRepository.FindByCondition(x => x.UserId.Equals(seekerId)).FirstOrDefault().Email;
+            var recruiterEmail = userRepository.FindByCondition(x => x.UserId.Equals(jobApplication.RecruiterId)).FirstOrDefault().Email;
+            var jobAdvert = jobAdvertService.Get(jobApplication.JobAdvertId);
+
+            return new ScheduleInterviewViewModel
+            {
+                JobAdvert = jobAdvert,
+                Company = company,
+                Address = address,
+                Recruiter = recruiter,
+                JobSeeker = jobSeeker,
+                JobSeekerEmail = jobSeekerEmail,
+                RecruiterEmail = recruiterEmail
+            };
+        }
+
+        public void ScheduleInterview(ScheduleInterviewViewModel scheduleInterviewViewModel, Interview interview)
+        {
+
+            var interviewCreate = new Interview 
+            { 
+                Id = Guid.NewGuid().ToString(),
+                Company = scheduleInterviewViewModel.Company.CompanyName,
+                Job = scheduleInterviewViewModel.JobAdvert.Caption,
+                Interviewer = interview.Interviewer,
+                InterviewDate = interview.InterviewDate,
+                InterviewLink = interview.InterviewLink.Substring(interview.InterviewLink.IndexOf("https://")),
+                InterviewType = interview.InterviewType,
+                CompanyId = scheduleInterviewViewModel.Company.Id,
+                JobAdvertId = interview.JobAdvertId,
+                JobSeekerId = interview.JobSeekerId,
+                RecruiterId = scheduleInterviewViewModel.Recruiter.Id,
+                DateCreated = DateTime.Now,
+                IsActive = true
+            };
+
+            _interviewRepository.Insert(interviewCreate);
+        }
         public IList<JobSeekerRecruiterSearch> GetJobSeekerBySkillAndCity(string skillId = null, string cityId = null)
         {
             var jobSeekers = jobSeekerRepository.Get();
@@ -548,6 +600,67 @@ namespace ISpaniInnerweb.Domain.Services
         public IList<Qualification> GetQualification()
         {
             return qualificationRepository.Get();
+        }
+
+        public IList<ViewInterviewViewModel> GetInterviews(string recruiterId)
+        {
+            var interview = _interviewRepository.FindByCondition(x => x.RecruiterId.Equals(recruiterId)).ToList();
+
+            var interviewList = new List<ViewInterviewViewModel>();
+
+            foreach (var item in interview)
+            {
+                var applicant = jobSeekerRepository.Get(item.JobSeekerId);
+                var email = userRepository.FindByCondition(x => x.UserId.Equals(item.JobSeekerId)).FirstOrDefault().Email;
+
+                interviewList.Add(new ViewInterviewViewModel { 
+                    InterviewDate = item.InterviewDate,
+                    Time = item.InterviewDate.Value.ToString("HH:mm"),
+                    Interviewer = item.Interviewer,
+                    InterviewLink = item.InterviewLink,
+                    InterviewType = item.InterviewType,
+                    Job = jobAdvertService.Get(item.JobAdvertId).Caption,
+                    JobAdvertId = item.JobAdvertId,
+                    JobSeekerId = item.JobSeekerId,
+                    Phone = applicant.Phone,
+                    Email = email,
+                    Applicant = applicant.FirstName + " " +applicant.LastName
+                });
+            }
+
+            return interviewList;
+        }
+
+        public IList<ViewInterviewViewModel> GetSeekersInterviews(string seekerId)
+        {
+            //Company Job Date Time Address Phone Email Interviewer
+            var interview = _interviewRepository.FindByCondition(x => x.JobSeekerId.Equals(seekerId)).ToList();
+
+            var interviewList = new List<ViewInterviewViewModel>();
+
+            foreach (var item in interview)
+            {
+                var recruiter = recruiterRepository.Get(item.RecruiterId);
+                var email = userRepository.FindByCondition(x => x.UserId.Equals(item.RecruiterId)).FirstOrDefault().Email;
+                var address = addressRepository.Get(companyService.Get(item.CompanyId).AddressId);
+
+                interviewList.Add(new ViewInterviewViewModel
+                {
+                    InterviewDate = item.InterviewDate,
+                    Time = item.InterviewDate.Value.ToString("HH:mm"),
+                    Interviewer = item.Interviewer,
+                    InterviewType = item.InterviewType,
+                    Company = item.Company,
+                    Address = address.StreetNumber + ", " + address.StreetName,
+                    Job = item.Job,
+                    JobAdvertId = item.JobAdvertId,
+                    Phone = recruiter.Phone,
+                    Email = email,
+                    Applicant = recruiter.FirstName + " " + recruiter.LastName
+                });
+            }
+
+            return interviewList;
         }
     }
 }

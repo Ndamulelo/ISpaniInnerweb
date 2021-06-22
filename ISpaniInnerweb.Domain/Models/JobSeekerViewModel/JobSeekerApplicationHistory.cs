@@ -10,5 +10,6 @@ namespace ISpaniInnerweb.Domain.Models.JobSeekerViewModel
         public string JobTtitle { set; get; }
         public string Company { set; get; }
         public string Status { set; get; }
+        public string CompanyId { set; get; }
     }
 }

@@ -24,6 +24,7 @@ namespace ISpaniInnerweb.Infrastructure.IOC
 
         service.AddDbContext<HustlersContext>();
             service.AddTransient<IRepository<User>, Repository<User>>();
+            service.AddTransient<IRepository<Interview>, Repository<Interview>>();
             service.AddTransient<IRepository<JobSeeker>, Repository<JobSeeker>>();
             service.AddTransient<IRepository<Ethnicity>, Repository<Ethnicity>>();
             service.AddTransient<IRepository<WorkExperience>, Repository<WorkExperience>>();

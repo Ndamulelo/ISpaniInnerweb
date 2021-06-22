@@ -1,0 +1,75 @@
+﻿@model Interview;
+
+@{
+    ViewData["Title"] = "Schedule Interview";
+    Layout = "~/Views/Shared/_AdminRecruiterLayout.cshtml";
+
+
+}
+
+<h5 class="page-title"> Schedule Interview</h5>
+<form asp-action="ScheduleInterview" asp-controller="JobAdvert" method="POST">
+
+    <div class="form-row">
+        <div class="col-md-6 mb-3">
+            <label for="InterviewDate">Interview Date</label>
+            <input type="datetime-local" name="InterviewDate" class="form-control" min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" max="2022-01-01" placeholder="2020-01-02">
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label for="InterviewType">Select Interview Type</label>
+            <select name="InterviewType" id="InterviewType" class="custom-select form-control">
+                <option value="Virtual">Virtual Interview</option>
+                <option selected value="Physical">Physical</option>
+            </select>
+        </div>
+
+        <!--Only Show if Interview Type is Virtual-->
+        <div class="col-md-6 mb-3" id="virtualLinkDiv">
+            <label for="InterviewLink">Interview Link</label>
+            <input type="text" name="InterviewLink" class="form-control" placeholder="https://calendar.google.com/interview/developer">
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label for="Interviewer">Interviewer</label>
+            <input type="text" name="Interviewer" class="form-control">
+        </div>
+
+    </div>
+
+    <!-- hidden imprtant fields -->
+    <input type="hidden" name="JobSeekerId" value="@Model.JobSeekerId">
+    <input type="hidden" name="JobAdvertId" value="@Model.JobAdvertId">
+
+    <div class="col-md-4 mt-4">
+        <button class="btn btn-primary" type="submit">Create</button>
+    </div>
+
+</form>
+@section Scripts{
+    <script>
+
+        $(document).ready(function () {
+
+            $("#virtualLinkDiv").hide();
+            //Lets hide and show link textbox based on the choosen option
+            var interviewType = "";
+
+            $("select#InterviewType").change(function () {
+                interviewType = $(this).children("option:selected").val();
+
+                if (interviewType == "Virtual") {
+                    //Navigate to google meet
+                    window.open('https://calendar.google.com/calendar/u/0/r/eventedit?vcon=meet&dates=now&hl=en&pli=1', '_blank');
+                    $("#virtualLinkDiv").show();
+                }
+                else {
+                    $("#virtualLinkDiv").hide();
+                }
+            });
+
+        });
+
+
+    </script>
+}

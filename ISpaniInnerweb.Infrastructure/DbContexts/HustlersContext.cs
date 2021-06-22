@@ -21,6 +21,7 @@ namespace ISpaniInnerweb.infrastructure.DbContexts
         public DbSet<Company> Company { get; set; }
         public DbSet<Education> Education { get; set; }
         public DbSet<Ethnicity> Ethnicity { get; set; }
+        public DbSet<Interview> Interview { get; set; }
         public DbSet<Gender> Gender { get; set; }
         public DbSet<JobCategory> JobCategory { get; set; }
         public DbSet<LanguageLevel> LanguageLevel { get; set; }

@@ -50,12 +50,12 @@
                     if (displayInviteDecline.Equals("yes"))
                     {
 
-                        <form method="post" asp-action="InviteForInterView" asp-controller="JobAdvert">
+                        <form method="get" asp-action="ScheduleInterview" asp-controller="JobAdvert">
 
-                            <input type="hidden" name="jobAdvertId" id="AdvertIdInterview" value="@Model.JobAdvertId">
-                            <input type="hidden" name="jobSeekerId" id="SeekerIdInterview" value="@Model.JobSeekerPersonalDetailsViewModel.JobSeekerId">
-
-                            <button type="submit" id="Interview" class="btn btn-success mr-1">Interview</button>
+                            <input type="hidden" name="sekkerId" id="AdvertIdInterview" value="@Model.JobSeekerPersonalDetailsViewModel.JobSeekerId">
+                            <input type="hidden" name="advertId" id="SeekerIdInterview" value="@Model.JobAdvertId">
+                            
+                            <button type="submit" id="Interview" class="link btn btn-success mr-1">Schedule Interview</button>
                         </form>
 
                         <form method="post" asp-action="DeclineApplication" asp-controller="JobAdvert">
