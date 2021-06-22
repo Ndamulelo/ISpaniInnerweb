@@ -360,7 +360,18 @@ namespace ISpaniInnerweb.Controllers
                 jobDetails.IsAlreadyAppliedBySeeker = true;
             }
 
+            //Send notification to seeker
+            _emailService.SendMail(jobDetails.Caption + " Application Received",
+                       "Good day \nThis email is to confirm that an application for "+
+                       jobDetails.Caption+ " with "+jobSeekerJobDetailsViewModel.Company+" has been received\n\n"+
+                       "If you do not hear from us within two weeks please consider your application unsuccessful.\n\n"+
+                       "Thank you\n\n Kind Regards\nISpani Innerweb Recruitment", HttpContext.Session.GetString("Username"));
 
+            //Send Notification to Recruiter
+            _emailService.SendMail(jobDetails.Caption + " Application Received",
+           "Good day \n Someone has shown an interest on the job that belongs to you. " +
+           jobDetails.Caption + " \n You can view applications on the system\n" +
+           "Thank you\n\n Kind Regards\nISpani Innerweb Recruitment", jobDetails.RecruiterEmail);
 
             return View("JobSeekerJobAdvertDetails", jobDetails);
         }
