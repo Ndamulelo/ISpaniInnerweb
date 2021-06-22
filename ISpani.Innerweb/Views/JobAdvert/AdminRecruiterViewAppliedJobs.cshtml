@@ -11,11 +11,13 @@
         <h5 class="card-title">Job Applications</h5>
     </div>
 
-    <!--<div class="header-elements text-right mr-2">
+    <div class="header-elements text-right mr-2">
 
-        <a asp-action="ExportRecruiterAppliedJobsReport" asp-controller="JobAdvert" class="btn btn-success">Export</a>
+        <form asp-action="ExportRecruiterAppliedJobsReport" asp-controller="JobAdvert" method="post">
+            <button type="submit" class="btn btn-success">Export</button>
+        </form>
 
-    </div>-->
+    </div>
 
     <div class="table-responsive">
         <table class="table">
@@ -52,7 +54,7 @@
                             }
 
                             var parms = new Dictionary<string, string>
-                                            {
+                                                    {
                                 { "id", item.JobSeekerId },
                                 { "jobAdvertId", item.JobAdvertId }
                             };

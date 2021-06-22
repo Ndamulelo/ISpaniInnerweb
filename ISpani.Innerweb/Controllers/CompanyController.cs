@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Text;
+using ClosedXML.Excel;
 using ISpaniInnerweb.Domain.Interfaces.Services;
 using ISpaniInnerweb.Domain.Models.CompanyViewModel;
 using Microsoft.AspNetCore.Hosting;
@@ -50,13 +53,12 @@ namespace ISpaniInnerweb.Controllers
                 }
             }
             
-            _logger.LogInformation("");
             return View(mappedCompanies);
         }
 
-        private string BuildCompanyReport()
+        public IActionResult ExportCompanyReport()
         {
-            var sb = new StringBuilder();
+
             var companies = _companyService.GetAll();
             var mappedCompanies = new List<ListCompanyViewModel>();
 
@@ -77,75 +79,41 @@ namespace ISpaniInnerweb.Controllers
                 }
             }
 
-            sb.Append(@"<div class='card'>
-            <div class='card-header header-elements-inline'>
-                <h5 class='card-title'>Company Report</h5>
-            </div>
-
-            <div class='table-responsive'>
-                <table class='table'>
-                    <thead>
-                        <tr>
-
-                            <th>Name</th>
-                            <th>Telephone</th>
-                            <th>City</th>
-                            <th>Province</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    ");
-
-            foreach (var item in mappedCompanies)
+            using (var workbook = new XLWorkbook())
             {
-                sb.AppendFormat(@"<tr>
-                                    <td>{0}</td>
-                                    <td>{1}</td>
-                                    <td>{2}</td>
-                                    <td>{3}</td>
-                                  </tr>",
-                   item.CompanyName,
-                   item.Telephone,
-                   item.City,
-                   item.Province);
+                var worksheet = workbook.Worksheets.Add("Companies");
+                var currentRow = 1;
 
+                worksheet.Cell(currentRow, 1).Value = "Name";
+                worksheet.Cell(currentRow, 2).Value = "Telephone";
+                worksheet.Cell(currentRow, 3).Value = "City";
+                worksheet.Cell(currentRow, 4).Value = "Province";
+
+                worksheet.Columns().AdjustToContents();
+
+                foreach (var appliedJob in mappedCompanies)
+                {
+                    currentRow++;
+                    worksheet.Cell(currentRow, 1).Value = appliedJob.CompanyName;
+                    worksheet.Cell(currentRow, 2).Value = appliedJob.Telephone;
+                    worksheet.Cell(currentRow, 3).Value = appliedJob.City;
+                    worksheet.Cell(currentRow, 4).Value = appliedJob.Province;
+                }
+
+                worksheet.Columns().AdjustToContents();
+
+                using (var stream = new MemoryStream())
+                {
+                    workbook.SaveAs(stream);
+                    var content = stream.ToArray();
+
+                    return File(
+                        content,
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        "companies_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xlsx");
+                }
             }
-
-            sb.AppendFormat(@"<tr>
-                                <td>Total Companies:</td>
-                                <td>{0}</td>
-                            </tr>", mappedCompanies.Count);
-
-            sb.Append(@"</ tbody>
-                </ table >
-            </ div >
-        </ div >");
-
-            return sb.ToString();
         }
-
-       /* public IActionResult ExportCompanyReport()
-        {
-            var Renderer = new IronPdf.HtmlToPdf();
-            //IronPdf.HtmlToPdf Renderer = new IronPdf.HtmlToPdf();
-            // add a header to very page easily
-            Renderer.PrintOptions.FirstPageNumber = 1;
-            Renderer.PrintOptions.Header.DrawDividerLine = true;
-            Renderer.PrintOptions.Header.CenterText = "{url}";
-            Renderer.PrintOptions.Header.FontFamily = "Helvetica,Arial";
-            Renderer.PrintOptions.Header.FontSize = 12;
-            Renderer.PrintOptions.CustomCssUrl = webHostEnvironment.WebRootPath + "\\css\\bootstrap.css";
-            // add a footer too
-            Renderer.PrintOptions.Footer.DrawDividerLine = true;
-            Renderer.PrintOptions.Footer.FontFamily = "Arial";
-            Renderer.PrintOptions.Footer.FontSize = 10;
-            Renderer.PrintOptions.Footer.LeftText = "{date} {time}";
-            Renderer.PrintOptions.Footer.RightText = "{page} of {total-pages}";
-            var file = Renderer.RenderHtmlAsPdf(BuildCompanyReport());
-            var contentLength = file.BinaryData.Length;
-
-            return File(file.BinaryData, "application/pdf;");
-        }*/
 
         // GET: CompanyController/Details/5
         public ActionResult Details(int id)

@@ -1,7 +1,9 @@
-﻿using ISpaniInnerweb.Domain.Entities;
+﻿using ClosedXML.Excel;
+using ISpaniInnerweb.Domain.Entities;
 using ISpaniInnerweb.Domain.Interfaces.Helpers;
 using ISpaniInnerweb.Domain.Interfaces.Services;
 using ISpaniInnerweb.Domain.Interfaces.Services.Communication;
+using ISpaniInnerweb.Domain.Models;
 using ISpaniInnerweb.Domain.Models.JobAdvertViewModel;
 using ISpaniInnerweb.Domain.Models.JobSeekerViewModel;
 using ISpaniInnerweb.Helpers;
@@ -11,6 +13,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.IO;
 using System.Text;
 
 namespace ISpaniInnerweb.Controllers
@@ -159,8 +163,86 @@ namespace ISpaniInnerweb.Controllers
             _jobSeekerService.ScheduleInterview(scheduleInterview, interview);
             //Update status on JobApplication Table
             _jobAdvertService.InviteToInverView(interview.JobAdvertId, interview.JobSeekerId);
+            //Send notification
+
 
             return View("InterviewInviteSuccess"); 
+        }
+        //Exporting Applicant Interviews
+        private IActionResult ExportJobSeekerInterviewHistoryToExcel(DataTable applicationHistory)
+        {
+
+            using (var workbook = new XLWorkbook())
+            {
+                var worksheet = workbook.Worksheets.Add("Application History");
+                var currentRow = 1;
+                worksheet.Cell(currentRow, 1).Value = "Company";
+                worksheet.Cell(currentRow, 2).Value = "Job";
+                worksheet.Cell(currentRow, 3).Value = "Date";
+                worksheet.Cell(currentRow, 4).Value = "Time";
+                worksheet.Cell(currentRow, 5).Value = "Address";
+                worksheet.Cell(currentRow, 6).Value = "Phone";
+                worksheet.Cell(currentRow, 7).Value = "Email";
+                worksheet.Cell(currentRow, 8).Value = "Recruiter";
+                worksheet.Cell(currentRow, 9).Value = "Type";
+                worksheet.Columns().AdjustToContents();
+
+                for (int i = 0; i < applicationHistory.Rows.Count; i++)
+                {
+                    {
+                        currentRow++;
+                        worksheet.Cell(currentRow, 1).Value = applicationHistory.Rows[i]["Company"];
+                        worksheet.Cell(currentRow, 2).Value = applicationHistory.Rows[i]["Job"];
+                        worksheet.Cell(currentRow, 3).Value = applicationHistory.Rows[i]["Date"];
+                        worksheet.Cell(currentRow, 4).Value = applicationHistory.Rows[i]["Time"];
+                        worksheet.Cell(currentRow, 5).Value = applicationHistory.Rows[i]["Address"];
+                        worksheet.Cell(currentRow, 6).Value = applicationHistory.Rows[i]["Phone"];
+                        worksheet.Cell(currentRow, 7).Value = applicationHistory.Rows[i]["Email"];
+                        worksheet.Cell(currentRow, 8).Value = applicationHistory.Rows[i]["Recruiter"];
+                        worksheet.Cell(currentRow, 9).Value = applicationHistory.Rows[i]["Type"];
+
+                    }
+                }
+
+                worksheet.Columns().AdjustToContents();
+
+                using var stream = new MemoryStream();
+                workbook.SaveAs(stream);
+                var content = stream.ToArray();
+                return File(
+                    content,
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    "JobInterviews_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xlsx");
+            }
+        }
+        private DataTable JobSeekerInterviewHistoryDataTable(IList<ViewInterviewViewModel> applicationHistoryList)
+        {
+            //Bad naming used for the sake of time
+            DataTable dtApplicationHistory = new DataTable("jobSeekerApplicationHistory");
+            dtApplicationHistory.Columns.AddRange(new DataColumn[9] { new DataColumn("Company"),
+                                            new DataColumn("Job"),
+                                            new DataColumn("Date"),
+                                            new DataColumn("Time"),
+                                            new DataColumn("Address"),
+                                            new DataColumn("Phone"),
+                                            new DataColumn("Email"),
+                                            new DataColumn("Recruiter"),
+                                            new DataColumn("Type")});
+            foreach (var application in applicationHistoryList)
+            {
+                dtApplicationHistory.Rows.Add(application.Company, application.Job, application.InterviewDate.Value.ToString("yyyy-MM-dd"), 
+                    application.Time, application.Address, application.Phone, application.Email, application.Applicant, application.InterviewType);
+            }
+
+            return dtApplicationHistory;
+        }
+
+
+        [HttpPost]
+        public IActionResult ExportJobSeekerInterviewHistoryReport()
+        {
+            var dtJobSeekerApplicationHistory = JobSeekerInterviewHistoryDataTable(_jobSeekerService.GetSeekersInterviews(HttpContext.Session.Get<string>("JobSeekerId")));
+            return ExportJobSeekerInterviewHistoryToExcel(dtJobSeekerApplicationHistory);
         }
 
         [HttpGet]
@@ -169,6 +251,56 @@ namespace ISpaniInnerweb.Controllers
             return View(_jobSeekerService.GetInterviews(HttpContext.Session.Get<string>("RecruiterId")));
         }
 
+        //Export Interviews For Recruiter 
+        public IActionResult ExportRecruiterInterviews()
+        {
+            var interviews = _jobSeekerService.GetInterviews(HttpContext.Session.Get<string>("RecruiterId"));
+
+            using (var workbook = new XLWorkbook())
+            {
+                var worksheet = workbook.Worksheets.Add("Recruiter Interviews");
+                var currentRow = 1;
+
+                worksheet.Cell(currentRow, 1).Value = "Job";
+                worksheet.Cell(currentRow, 2).Value = "Date";
+                worksheet.Cell(currentRow, 3).Value = "Time";
+                worksheet.Cell(currentRow, 4).Value = "Interviewer";
+                worksheet.Cell(currentRow, 5).Value = "Applicant";
+                worksheet.Cell(currentRow, 6).Value = "Email";
+                worksheet.Cell(currentRow, 7).Value = "Phone";
+                worksheet.Cell(currentRow, 8).Value = "InterviewLink";
+                worksheet.Cell(currentRow, 9).Value = "InterviewType";
+
+                worksheet.Columns().AdjustToContents();
+
+                foreach (var interview in interviews)
+                {
+                    currentRow++;
+                    worksheet.Cell(currentRow, 1).Value = interview.Job;
+                    worksheet.Cell(currentRow, 2).Value = interview.InterviewDate.Value.ToString("yyyy-MM-dd");
+                    worksheet.Cell(currentRow, 3).Value = interview.InterviewDate.Value.ToString("HH:mm");
+                    worksheet.Cell(currentRow, 4).Value = interview.Interviewer;
+                    worksheet.Cell(currentRow, 5).Value = interview.Applicant;
+                    worksheet.Cell(currentRow, 6).Value = interview.Email;
+                    worksheet.Cell(currentRow, 7).Value = interview.Phone;
+                    worksheet.Cell(currentRow, 8).Value = interview.InterviewLink;
+                    worksheet.Cell(currentRow, 9).Value = interview.InterviewType;
+                }
+
+                worksheet.Columns().AdjustToContents();
+
+                using (var stream = new MemoryStream())
+                {
+                    workbook.SaveAs(stream);
+                    var content = stream.ToArray();
+
+                    return File(
+                        content,
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        "AppliedJobsReport" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xlsx");
+                }
+            }
+        }
         // GET: For Admin and Recruiter
         [HttpGet]
         public ActionResult JobAdvertList(string jobTypeId, string companyId, DateTime dateFrom, DateTime dateTo, string jobCategoryId)
@@ -218,7 +350,7 @@ namespace ISpaniInnerweb.Controllers
                 jobSeekerJobDetailsViewModel.CompanyId,
                 HttpContext.Session.Get<string>("JobSeekerId")
                 );
-            TempData["Apply"] = "Job Applied";
+
             TempData["Apply"] = "Job Applied";
 
             var jobDetails = _jobAdvertService.GetDetailedJob(jobSeekerJobDetailsViewModel.JobAdvertId);
@@ -227,6 +359,8 @@ namespace ISpaniInnerweb.Controllers
             {
                 jobDetails.IsAlreadyAppliedBySeeker = true;
             }
+
+
 
             return View("JobSeekerJobAdvertDetails", jobDetails);
         }
@@ -256,114 +390,54 @@ namespace ISpaniInnerweb.Controllers
             var appliedJobs = _recruiterService.GetAppliedJobs(HttpContext.Session.Get<string>("RecruiterId"));
 
             return View("AdminRecruiterViewAppliedJobs",appliedJobs);
-        }        
-        
-        private string BuildRecruiterViewAppliedJobsReport()
-        {
-            var appliedJobs = _recruiterService.GetAppliedJobs(HttpContext.Session.Get<string>("RecruiterId"));
-            var sb = new StringBuilder();
-            int pending = 0, interviewed = 0, declined = 0;
-
-            sb.Append(@"<div class='card'>
-            <div class='card-header header-elements-inline'>
-                <h5 class='card-title'>Recruiter Job Applications History</h5>
-            </div>
-
-            <div class='table-responsive'>
-                <table class='table'>
-                    <thead>
-                        <tr>
-
-                            <th>Date</th>
-                            <th>ApplicantName</th>
-                            <th>Contacts</th>
-                            <th>Job</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    ");  
-            
-            foreach (var item in appliedJobs)
-            {
-                
-                if (item.ApplicationStatus.Equals("Pending"))
-                {
-                    pending = pending + 1;
-                }
-                else if (item.ApplicationStatus.Equals("Declined"))
-                {
-                    declined = declined + 1;
-                }
-                else
-                {
-                    interviewed = interviewed + 1;
-                }
-                sb.AppendFormat(@"<tr>
-                                    <td>{0}</td>
-                                    <td>{1}</td>
-                                    <td>{2} {3}</td>
-                                    <td>{4}</td>
-                                    <td>{5}</td>
-                                  </tr>",
-                    item.DateCreated.ToString("yyyy-MM-dd"),
-                    item.ApplicantName,
-                    item.ApplicantPhone,
-                    item.Email,
-                    item.JobCaption,
-                    item.ApplicationStatus);
-       
-                }
-            sb.AppendFormat(@"<tr>
-                                <td>Total Jobs Applied:</td>
-                                <td>{0}</td>
-                            </tr>", appliedJobs.Count);
-
-            sb.AppendFormat(@"<tr>
-                                <td>Pending Job Application:</td>
-                                <td>{0}</td>
-                            </tr>", pending);
-
-            sb.AppendFormat(@"<tr>
-                                <td>Interviewed Job Application:</td>
-                                <td>{0}</td>
-                            </tr>", interviewed);
-
-            sb.AppendFormat(@"<tr>
-                                <td>Declined Job Application:</td>
-                                <td>{0}</td>
-                            </tr>", declined);
-
-            sb.Append(@"</ tbody>
-                </ table >
-            </ div >
-        </ div >");
-
-            return sb.ToString();
         }
 
-        /*public IActionResult ExportRecruiterAppliedJobsReport()
-        {
-            var Renderer = new IronPdf.HtmlToPdf();
-            //IronPdf.HtmlToPdf Renderer = new IronPdf.HtmlToPdf();
-            // add a header to very page easily
-            Renderer.PrintOptions.FirstPageNumber = 1;
-            Renderer.PrintOptions.Header.DrawDividerLine = true;
-            Renderer.PrintOptions.Header.CenterText = "{url}";
-            Renderer.PrintOptions.Header.FontFamily = "Helvetica,Arial";
-            Renderer.PrintOptions.Header.FontSize = 12;
-            Renderer.PrintOptions.CustomCssUrl = webHostEnvironment.WebRootPath + "\\css\\bootstrap.css";
-            // add a footer too
-            Renderer.PrintOptions.Footer.DrawDividerLine = true;
-            Renderer.PrintOptions.Footer.FontFamily = "Arial";
-            Renderer.PrintOptions.Footer.FontSize = 10;
-            Renderer.PrintOptions.Footer.LeftText = "{date} {time}";
-            Renderer.PrintOptions.Footer.RightText = "{page} of {total-pages}";
-            var file = Renderer.RenderHtmlAsPdf(BuildRecruiterViewAppliedJobsReport());
-            var contentLength = file.BinaryData.Length;
 
-            return File(file.BinaryData, "application/pdf;");
-        }*/
+        public IActionResult ExportRecruiterAppliedJobsReport()
+        {
+            var appliedJobs = _recruiterService.GetAppliedJobs(HttpContext.Session.Get<string>("RecruiterId"));
+
+            using (var workbook = new XLWorkbook())
+            {
+                var worksheet = workbook.Worksheets.Add("Users");
+                var currentRow = 1;
+
+                worksheet.Cell(currentRow, 1).Value = "Date";
+                worksheet.Cell(currentRow, 2).Value = "Time";
+                worksheet.Cell(currentRow, 3).Value = "ApplicantName";
+                worksheet.Cell(currentRow, 4).Value = "Email";
+                worksheet.Cell(currentRow, 5).Value = "Phone";
+                worksheet.Cell(currentRow, 6).Value = "Job";
+                worksheet.Cell(currentRow, 7).Value = "ApplicationStatus";
+
+                worksheet.Columns().AdjustToContents();
+
+                foreach (var appliedJob in appliedJobs)
+                {
+                    currentRow++;
+                    worksheet.Cell(currentRow, 1).Value = appliedJob.DateCreated.ToString("yyyy-MM-dd");
+                    worksheet.Cell(currentRow, 2).Value = appliedJob.DateCreated.ToString("HH:mm");
+                    worksheet.Cell(currentRow, 3).Value = appliedJob.ApplicantName;
+                    worksheet.Cell(currentRow, 4).Value = appliedJob.Email;
+                    worksheet.Cell(currentRow, 5).Value = appliedJob.ApplicantPhone;
+                    worksheet.Cell(currentRow, 6).Value = appliedJob.JobCaption;
+                    worksheet.Cell(currentRow, 7).Value = appliedJob.ApplicationStatus;
+                }
+
+                worksheet.Columns().AdjustToContents();
+
+                using (var stream = new MemoryStream())
+                {
+                    workbook.SaveAs(stream);
+                    var content = stream.ToArray();
+
+                    return File(
+                        content,
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        "RecruiterAppliedJobsReport" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xlsx");
+                }
+            }
+        }
 
         public ActionResult RecruiterAppliedJobsDetails(string id,string jobAdvertId)
         {

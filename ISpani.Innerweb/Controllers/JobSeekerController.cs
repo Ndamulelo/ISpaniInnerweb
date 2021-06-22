@@ -15,6 +15,9 @@ using System.Text.RegularExpressions;
 using System.IO;
 using ISpaniInnerweb.Domain.Interfaces.Helpers;
 using System.Text;
+using ClosedXML.Excel;
+using System.Xml;
+using System.Data;
 
 namespace ISpaniInnerweb.Controllers
 {
@@ -395,182 +398,115 @@ namespace ISpaniInnerweb.Controllers
             return View("RecruiterSearch", jobSeekerRecruiterSearchContainer);
         }
 
+        //Export Job Seeker Search Results
+        public IActionResult ExportRecruiterJobSeekerSearchResults()
+        {
+
+            var jobSeekers = _jobSeekerService.GetJobSeekerBySkillAndCity(HttpContext.Session.Get<string>("SkillId"), 
+                HttpContext.Session.Get<string>("CityId"));
+
+            using (var workbook = new XLWorkbook())
+            {
+                var worksheet = workbook.Worksheets.Add("Job Seekers");
+                var currentRow = 1;
+
+                worksheet.Cell(currentRow, 1).Value = "Name";
+                worksheet.Cell(currentRow, 2).Value = "Email";
+                worksheet.Cell(currentRow, 3).Value = "Qualification";
+                worksheet.Cell(currentRow, 4).Value = "Institution";
+                worksheet.Cell(currentRow, 5).Value = "Address";
+
+                worksheet.Columns().AdjustToContents();
+
+                foreach (var appliedJob in jobSeekers)
+                {
+                    currentRow++;
+                    worksheet.Cell(currentRow, 1).Value = appliedJob.JobSeekerFullName;
+                    worksheet.Cell(currentRow, 2).Value = appliedJob.Email;
+                    worksheet.Cell(currentRow, 3).Value = appliedJob.Qualification;
+                    worksheet.Cell(currentRow, 4).Value = appliedJob.Insitution;
+                    worksheet.Cell(currentRow, 5).Value = appliedJob.Address;
+                }
+
+                worksheet.Columns().AdjustToContents();
+
+                using (var stream = new MemoryStream())
+                {
+                    workbook.SaveAs(stream);
+                    var content = stream.ToArray();
+
+                    return File(
+                        content,
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        "JobSeekerSearchReport_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xlsx");
+                }
+            }
+        }
         public ActionResult JobApplicationHistory()
         {
 
             return View("JobApplicationHistory",_jobSeekerService.GetJobSeekerApplicationHistory(HttpContext.Session.Get<string>("JobSeekerId")));
         }
 
-        //Seeker rearch results 
-        private string BuildSearchSeekerReport(IList<JobSeekerRecruiterSearch> jobSeekerRecruiterSearches)
+        private IActionResult ExportJobSeekerApplicationHistoryToExcel(DataTable applicationHistory)
         {
-            var sb = new StringBuilder();
-
-            sb.Append(@"<div class='card'>
-            <div class='card-header header-elements-inline'>
-                <h5 class='card-title'>List of Job Seekers Report</h5>
-            </div>
-
-            <div class='table-responsive'>
-                <table class='table'>
-                    <thead>
-                        <tr>
-
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Qualification</th>
-                            <th>Institution</th>
-                            <th>Address</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    ");
-
-            foreach (var item in jobSeekerRecruiterSearches)
+            using (var workbook = new XLWorkbook())
             {
-                 sb.AppendFormat(@"<tr>
-                                    <td>{0}</td>
-                                    <td>{1}</td>
-                                    <td>{2}</td>
-                                    <td>{3}</td>
-                                    <td>{4}</td>
-                                  </tr>",
-                    item.JobSeekerFullName,
-                    item.Email,
-                    item.Qualification,
-                    item.Insitution,
-                    item.Address);
+                var worksheet = workbook.Worksheets.Add("Application History");
+                var currentRow = 1;
+                worksheet.Cell(currentRow, 1).Value = "ApplicationDate";
+                worksheet.Cell(currentRow, 2).Value = "JobTtitle";
+                worksheet.Cell(currentRow, 3).Value = "Company";
+                worksheet.Cell(currentRow, 4).Value = "Status";
+                worksheet.Columns().AdjustToContents();
 
+                for (int i = 0; i < applicationHistory.Rows.Count; i++)
+                {
+                    {
+                        currentRow++;
+                        worksheet.Cell(currentRow, 1).Value = applicationHistory.Rows[i]["CreatedDate"];
+                        worksheet.Cell(currentRow, 2).Value = applicationHistory.Rows[i]["JobTtitle"];
+                        worksheet.Cell(currentRow, 3).Value = applicationHistory.Rows[i]["Company"];
+                        worksheet.Cell(currentRow, 4).Value = applicationHistory.Rows[i]["Status"];
+
+                    }
+                }
+
+                worksheet.Columns().AdjustToContents();
+
+                using var stream = new MemoryStream();
+                workbook.SaveAs(stream);
+                var content = stream.ToArray();
+                return File(
+                    content,
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    "jobApplicationHistory_"+DateTime.Now.ToString("yyyyMMddHHmmss")+".xlsx");
             }
-            
-
-            sb.Append(@"</ tbody>
-                </ table >
-            </ div >
-        </ div >");
-
-            return sb.ToString();
         }
-        /*public IActionResult ExportSearchSeekerReport()
+        private DataTable JobSeekerApplicationHistoryDataTable(IList<JobSeekerApplicationHistory> applicationHistoryList)
         {
-            var searchResults = _jobSeekerService.GetJobSeekerBySkillAndCity(HttpContext.Session.Get<string>("SkillId"), HttpContext.Session.Get<string>("CityId"));
 
-            var Renderer = new IronPdf.HtmlToPdf();
-            //IronPdf.HtmlToPdf Renderer = new IronPdf.HtmlToPdf();
-            // add a header to very page easily
-            Renderer.PrintOptions.FirstPageNumber = 1;
-            Renderer.PrintOptions.Header.DrawDividerLine = true;
-            Renderer.PrintOptions.Header.CenterText = "{url}";
-            Renderer.PrintOptions.Header.FontFamily = "Helvetica,Arial";
-            Renderer.PrintOptions.Header.FontSize = 12;
-            Renderer.PrintOptions.CustomCssUrl = webHostEnvironment.WebRootPath + "\\css\\bootstrap.css";
-            // add a footer too
-            Renderer.PrintOptions.Footer.DrawDividerLine = true;
-            Renderer.PrintOptions.Footer.FontFamily = "Arial";
-            Renderer.PrintOptions.Footer.FontSize = 10;
-            Renderer.PrintOptions.Footer.LeftText = "{date} {time}";
-            Renderer.PrintOptions.Footer.RightText = "{page} of {total-pages}";
-            var file = Renderer.RenderHtmlAsPdf(BuildSearchSeekerReport(searchResults));
-            var contentLength = file.BinaryData.Length;
-
-            return File(file.BinaryData, "application/pdf;");
-        }*/
-        //Building a Job Seeker Job History Report
-        private string BuildJobHistoryReport(IList<JobSeekerApplicationHistory> jobSeekerApplicationHistory)
-        {
-            var sb = new StringBuilder();
-            int pending = 0, interviewed = 0, declined = 0;
-
-            sb.Append(@"
-                        <html>
-                            <head>
-                            </head>
-                            <body>
-                <div class='header'><h1>Job History Report</h1></div>
-                <table align='center'>
-                                    <tr>
-                                        
-                                        <th>Date</th>
-                                        <th>Job Title</th>
-                                        <th>Company Name</th><!--email+phone-->
-                                        <th>Status</th>
-                                    </tr>");
-            foreach (var jobApplication in jobSeekerApplicationHistory)
+            DataTable dtApplicationHistory = new DataTable("jobSeekerApplicationHistory");
+            dtApplicationHistory.Columns.AddRange(new DataColumn[4] { new DataColumn("JobTtitle"),
+                                            new DataColumn("Company"),
+                                            new DataColumn("Status"),
+                                            new DataColumn("CreatedDate") });
+            foreach (var application in applicationHistoryList)
             {
-                if(jobApplication.Status.Equals("Pending"))
-                {
-                    pending = pending + 1;
-                }
-                else if(jobApplication.Status.Equals("Declined"))
-                {
-                    declined = declined + 1;
-                }
-                else
-                {
-                    interviewed = interviewed + 1;
-                }
-
-                sb.AppendFormat(@"<tr>
-                                    <td>{0}</td>
-                                    <td>{1}</td>
-                                    <td>{2}</td>
-                                    <td>{3}</td>
-                                  </tr>",
-                                  jobApplication.CreatedDate,
-                                  jobApplication.JobTtitle,
-                                  jobApplication.Company,
-                                  jobApplication.Status);
+                dtApplicationHistory.Rows.Add(application.JobTtitle, application.Company, application.Status, application.CreatedDate);
             }
 
-            sb.AppendFormat(@"<tr>
-                                <td>Total Jobs Applied:</td>
-                                <td>{0}</td>
-                            </tr>", jobSeekerApplicationHistory.Count);            
-            
-            sb.AppendFormat(@"<tr>
-                                <td>Pending Job Application:</td>
-                                <td>{0}</td>
-                            </tr>", pending);            
-            
-            sb.AppendFormat(@"<tr>
-                                <td>Interviewed Job Application:</td>
-                                <td>{0}</td>
-                            </tr>", interviewed);            
-            
-            sb.AppendFormat(@"<tr>
-                                <td>Declined Job Application:</td>
-                                <td>{0}</td>
-                            </tr>", declined);
-
-            sb.Append(@"
-                                </table>
-                            </body>
-                        </html>");
-            return sb.ToString();
+            return dtApplicationHistory;
         }
 
-        /*public IActionResult ExportJobHistoryReport()
+
+        [HttpPost]
+        public IActionResult ExportJobSeekerHistoryReport()
         {
-            var Renderer = new IronPdf.HtmlToPdf();
-            //IronPdf.HtmlToPdf Renderer = new IronPdf.HtmlToPdf();
-            // add a header to very page easily
-            Renderer.PrintOptions.FirstPageNumber = 1;
-            Renderer.PrintOptions.Header.DrawDividerLine = true;
-            Renderer.PrintOptions.Header.CenterText = "{url}";
-            Renderer.PrintOptions.Header.FontFamily = "Helvetica,Arial";
-            Renderer.PrintOptions.Header.FontSize = 12;
-            Renderer.PrintOptions.CustomCssUrl = webHostEnvironment.WebRootPath + "\\css\\report_styles.css";
-            // add a footer too
-            Renderer.PrintOptions.Footer.DrawDividerLine = true;
-            Renderer.PrintOptions.Footer.FontFamily = "Arial";
-            Renderer.PrintOptions.Footer.FontSize = 10;
-            Renderer.PrintOptions.Footer.LeftText = "{date} {time}";
-            Renderer.PrintOptions.Footer.RightText = "{page} of {total-pages}";
-            var file = Renderer.RenderHtmlAsPdf(BuildJobHistoryReport(_jobSeekerService.GetJobSeekerApplicationHistory(HttpContext.Session.Get<string>("JobSeekerId"))));
-            var contentLength = file.BinaryData.Length;
-           
-            return File(file.BinaryData, "application/pdf;");
-        }*/
+
+            var dtJobSeekerApplicationHistory = JobSeekerApplicationHistoryDataTable(_jobSeekerService.GetJobSeekerApplicationHistory(HttpContext.Session.Get<string>("JobSeekerId")));
+            return ExportJobSeekerApplicationHistoryToExcel(dtJobSeekerApplicationHistory);
+        }
 
         // GET: JobSeekerController/Details/5
         public ActionResult Details(int id)

@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Text;
 using Microsoft.AspNetCore.Hosting;
+using ClosedXML.Excel;
+using System.IO;
 
 namespace ISpaniInnerweb.Controllers
 {
@@ -63,77 +65,45 @@ namespace ISpaniInnerweb.Controllers
             return View("AdminViewRecruiter", searchFilterAndDataModel);
         }
 
-        private string BuildRecruiterListReport()
+        [HttpPost]
+        public IActionResult ExportRecruiterReport()
         {
-            var sb = new StringBuilder();
+
             var recruiters = _recruiterService.GetAll(null);
 
-            sb.Append(@"<div class='card'>
-            <div class='card-header header-elements-inline'>
-                <h5 class='card-title'>List of Job Seekers Report</h5>
-            </div>
-
-            <div class='table-responsive'>
-                <table class='table'>
-                    <thead>
-                        <tr>
-
-                            <th>Full Name</th>
-                            <th>Email</th>
-                            <th>Company</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    ");
-
-            foreach (var item in recruiters)
+            using (var workbook = new XLWorkbook())
             {
-                sb.AppendFormat(@"<tr>
-                                    <td>{0}</td>
-                                    <td>{1}</td>
-                                    <td>{2}</td>
-                                  </tr>",
-                   item.FullName,
-                   item.Email,
-                   item.CompanyName);
+                var worksheet = workbook.Worksheets.Add("Recruiters");
+                var currentRow = 1;
 
+                worksheet.Cell(currentRow, 1).Value = "Name";
+                worksheet.Cell(currentRow, 2).Value = "Email";
+                worksheet.Cell(currentRow, 3).Value = "Company";
+
+                worksheet.Columns().AdjustToContents();
+
+                foreach (var appliedJob in recruiters)
+                {
+                    currentRow++;
+                    worksheet.Cell(currentRow, 1).Value = appliedJob.FullName;
+                    worksheet.Cell(currentRow, 2).Value = appliedJob.Email;
+                    worksheet.Cell(currentRow, 3).Value = appliedJob.CompanyName;
+                }
+
+                worksheet.Columns().AdjustToContents();
+
+                using (var stream = new MemoryStream())
+                {
+                    workbook.SaveAs(stream);
+                    var content = stream.ToArray();
+
+                    return File(
+                        content,
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        "Recruiters_" + DateTime.Now.ToString("yyyyMMddHHmmss") + ".xlsx");
+                }
             }
-
-            sb.AppendFormat(@"<tr>
-                                <td>Total Recruiters:</td>
-                                <td>{0}</td>
-                            </tr>", recruiters.Count);
-
-            sb.Append(@"</ tbody>
-                </ table >
-            </ div >
-        </ div >");
-
-            return sb.ToString();
         }
-
-        /*public IActionResult ExportRecruiterReport()
-        {
-            var Renderer = new IronPdf.HtmlToPdf();
-            //IronPdf.HtmlToPdf Renderer = new IronPdf.HtmlToPdf();
-            // add a header to very page easily
-            Renderer.PrintOptions.FirstPageNumber = 1;
-            Renderer.PrintOptions.Header.DrawDividerLine = true;
-            Renderer.PrintOptions.Header.CenterText = "{url}";
-            Renderer.PrintOptions.Header.FontFamily = "Helvetica,Arial";
-            Renderer.PrintOptions.Header.FontSize = 12;
-            Renderer.PrintOptions.CustomCssUrl = webHostEnvironment.WebRootPath + "\\css\\bootstrap.css";
-            // add a footer too
-            Renderer.PrintOptions.Footer.DrawDividerLine = true;
-            Renderer.PrintOptions.Footer.FontFamily = "Arial";
-            Renderer.PrintOptions.Footer.FontSize = 10;
-            Renderer.PrintOptions.Footer.LeftText = "{date} {time}";
-            Renderer.PrintOptions.Footer.RightText = "{page} of {total-pages}";
-            var file = Renderer.RenderHtmlAsPdf(BuildRecruiterListReport());
-            var contentLength = file.BinaryData.Length;
-
-            return File(file.BinaryData, "application/pdf;");
-        }*/
 
         // GET: RecruiterController/Details/5
         public ActionResult Details(int id)

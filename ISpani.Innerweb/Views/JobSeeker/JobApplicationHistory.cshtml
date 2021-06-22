@@ -11,20 +11,20 @@
         <h5 class="card-title">Job Applications History</h5>
     </div>
 
-    <!--<div class="header-elements text-right mr-2">
-
-        <a asp-action="ExportJobHistoryReport" asp-controller="JobSeeker" class="btn btn-success">Export</a>
-
-    </div>-->
+    <div class="header-elements text-right mr-2">
+        
+        <form asp-action="ExportJobSeekerHistoryReport" asp-controller="JobSeeker" method="post">
+            <button type="submit"  class="btn btn-success">Export</button>
+        </form>
+    </div>
 
     <div class="table-responsive">
         <table class="table">
             <thead>
                 <tr>
-                    <th>#</th>
                     <th>Date</th>
                     <th>Job Title</th>
-                    <th>Company Name</th><!--email+phone-->
+                    <th>Company Name</th>
                     <th>Status</th>
                 </tr>
             </thead>
@@ -52,7 +52,6 @@
                             }
 
                             <tr>
-                                <td></td>
                                 <td>@item.CreatedDate.ToString("yyyy-MM-dd")</td>
                                 <td>@item.JobTtitle</td>
                                 <td>@item.Company</td>

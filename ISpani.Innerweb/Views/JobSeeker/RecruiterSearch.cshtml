@@ -6,7 +6,9 @@
 
 <div class="header-elements text-right mr-2">
 
-    <a asp-action="ExportSearchSeekerReport" asp-controller="JobSeeker" class="btn btn-success">Export</a>
+    <form asp-action="ExportRecruiterJobSeekerSearchResults" asp-controller="JobSeeker" method="post">
+        <button type="submit" class="btn btn-success">Export</button>
+    </form>
 
 </div>
 

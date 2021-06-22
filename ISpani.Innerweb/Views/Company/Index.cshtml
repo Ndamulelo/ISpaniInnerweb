@@ -6,7 +6,9 @@
 
 <div class="header-elements text-right mr-2">
 
-    <a asp-action="ExportCompanyReport" asp-controller="Company" class="btn btn-success">Export</a>
+    <form asp-action="ExportCompanyReport" asp-controller="Company" method="post">
+        <button type="submit" class="btn btn-success">Export</button>
+    </form>
 
 </div>
 
@@ -24,7 +26,6 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>#</th>
                     <th>Name</th>
                     <th>Telephone</th>
                     <th>City</th>
@@ -38,7 +39,6 @@
                     foreach (var item in Model)
                     {
                         <tr>
-                            <td></td>
                             <td>@item.CompanyName</td>
                             <td>@item.Telephone</td>
                             <td>@item.City</td>

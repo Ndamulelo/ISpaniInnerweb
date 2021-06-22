@@ -11,11 +11,13 @@
         <h5 class="card-title">Interviews</h5>
     </div>
 
-    <!--<div class="header-elements text-right mr-2">
+    <div class="header-elements text-right mr-2">
 
-        <a asp-action="ExportRecruiterAppliedJobsReport" asp-controller="JobAdvert" class="btn btn-success">Export</a>
+        <form asp-action="ExportRecruiterInterviews" asp-controller="JobAdvert" method="post">
+            <button type="submit" class="btn btn-success">Export</button>
+        </form>
 
-    </div>-->
+    </div>
 
     <div class="table-responsive">
         <table class="table">
@@ -52,17 +54,17 @@
                                 link = "#";
                             }
 
-                                <tr>
-                                    <td>@item.Job</td>
-                                    <td>@item.InterviewDate.Value.ToString("yyyy-MM-dd")</td>
-                                    <td>@item.Time</td>
-                                    <td>@item.Interviewer</td>
-                                    <td>@item.Applicant</td>
+                            <tr>
+                                <td>@item.Job</td>
+                                <td>@item.InterviewDate.Value.ToString("yyyy-MM-dd")</td>
+                                <td>@item.Time</td>
+                                <td>@item.Interviewer</td>
+                                <td>@item.Applicant</td>
 
-                                    <td>@item.Phone <a href="mailto:@item.Email">@item.Email</a></td>
-                                    <td><a href="@link" target="_blank">@status</a></td>
-                                    <td>@item.InterviewType</td>
-                                </tr>
+                                <td>@item.Phone <a href="mailto:@item.Email">@item.Email</a></td>
+                                <td><a href="@link" target="_blank">@status</a></td>
+                                <td>@item.InterviewType</td>
+                            </tr>
                         }
                     }
                 }
