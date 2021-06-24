@@ -428,6 +428,11 @@ namespace ISpaniInnerweb.Domain.Services
 
         public void ScheduleInterview(ScheduleInterviewViewModel scheduleInterviewViewModel, Interview interview)
         {
+            // Fix bug for when adding physical interviews
+            // It breaks because interview link is empty
+            var link = "";
+
+            link = interview.InterviewType.Equals("Virtual") ? interview.InterviewLink.Substring(interview.InterviewLink.IndexOf("https://")) : "";
 
             var interviewCreate = new Interview 
             { 
@@ -436,7 +441,7 @@ namespace ISpaniInnerweb.Domain.Services
                 Job = scheduleInterviewViewModel.JobAdvert.Caption,
                 Interviewer = interview.Interviewer,
                 InterviewDate = interview.InterviewDate,
-                InterviewLink = interview.InterviewLink.Substring(interview.InterviewLink.IndexOf("https://")),
+                InterviewLink = link,
                 InterviewType = interview.InterviewType,
                 CompanyId = scheduleInterviewViewModel.Company.Id,
                 JobAdvertId = interview.JobAdvertId,
