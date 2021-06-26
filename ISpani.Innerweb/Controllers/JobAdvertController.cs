@@ -348,6 +348,12 @@ namespace ISpaniInnerweb.Controllers
         [HttpPost]
         public IActionResult ApplyForJob(JobSeekerJobDetailsViewModel jobSeekerJobDetailsViewModel)
         {
+            //Redirect to profile if applicant's profile is still incomplete.
+            if(!_jobAdvertService.IsProfileComplete(HttpContext.Session.Get<string>("JobSeekerId")))
+            {
+                RedirectToAction("Profile", "JobSeeker");
+            }
+
             _jobAdvertService.ApplyJob(
                 jobSeekerJobDetailsViewModel.JobAdvertId,
                 jobSeekerJobDetailsViewModel.RecruiterId,
@@ -374,7 +380,7 @@ namespace ISpaniInnerweb.Controllers
             //Send Notification to Recruiter
             _emailService.SendMail(jobDetails.Caption + " Application Received",
            "Good day \n Someone has shown an interest on the job that belongs to you. " +
-           jobDetails.Caption + " \n You can view applications on the system\n" +
+           jobDetails.Caption + " \n\n You can view applications on the system\n\n" +
            "Thank you\n\n Kind Regards\nISpani Innerweb Recruitment", jobDetails.RecruiterEmail);
 
             return View("JobSeekerJobAdvertDetails", jobDetails);

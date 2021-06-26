@@ -21,6 +21,7 @@ namespace ISpaniInnerweb.Domain.Interfaces.Services
         void InviteToInverView(string jobAdvertId, string jobSeekerId);
         bool IsAlreadyApplied(string jobId, string jobSeekerId);
         IList<JobAdvert> GetAll();
+        bool IsProfileComplete(string seekerId);
         //Filter with JobType, JobCategory and Province
         IQueryable<JobAdvert> GetJobAdvertsByFilter(JobAdvertSearchModel jobAdvertSearchModel);
         IList<ViewJobAdvertViewModel> GetAllByAdminRecruiter(DateTime dateFrom, DateTime dateTo,string jobTypeId, string companyId, string jobCategoryId);

@@ -18,7 +18,11 @@ namespace ISpaniInnerweb.Domain.Services
         IRepository<Recruiter> recruiterRepository;
         IRepository<JobSeeker> jobSeekerRepository;
         IRepository<JobSeekerJobApplications> jobSeekerJobApplicationsRepository;
+        IRepository<Attachment> attachmentRepository;
         IRepository<JobAdvert> jobAdvertRepository;
+        IRepository<JobSeekerLanguages> jobSeekerLanguageRepository;
+        IRepository<Education> educationRepository;
+        IRepository<JobSeekerSkills> jobSeekerSkillsRepository;
         IStringManipulator _stringManipulator;
         ILogger<JobAdvertService> logger;
 
@@ -34,10 +38,15 @@ namespace ISpaniInnerweb.Domain.Services
             IRepository<JobSeeker> jobSeekerRepository, IRepository<JobAdvert> jobAdvertRepository, IStringManipulator stringManipulator,
             ICompanyService companyService, IExperienceLevelService experienceLevelService, IProvinceService provinceService, IRecruiterService recruiterService, 
             IJobCategoryService jobCategoryService, IJobTypeService jobTypeService, ICityService cityService, IRepository<JobSeekerJobApplications> jobSeekerJobApplicationsRepository
-            )
+            , IRepository<Attachment> attachmentRepository, IRepository<Education> educationRepository, IRepository<JobSeekerLanguages> jobSeekerLanguageRepository,
+            IRepository<JobSeekerSkills> jobSeekerSkillsRepository)
         {
+            this.attachmentRepository = attachmentRepository;
             this.recruiterRepository = recruiterRepository;
             this.jobAdvertRepository = jobAdvertRepository;
+            this.educationRepository = educationRepository;
+            this.jobSeekerSkillsRepository = jobSeekerSkillsRepository;
+            this.jobSeekerLanguageRepository = jobSeekerLanguageRepository;
             this.userRepository = userRepository;
             _companyService = companyService;
             _provinceService = provinceService;
@@ -123,6 +132,43 @@ namespace ISpaniInnerweb.Domain.Services
             return (IQueryable<JobAdvert>)JobAdverts;
         }        
         
+        public bool IsProfileComplete(string seekerId)
+        {
+            var seeker = jobSeekerRepository.Get(seekerId);
+            var attachments = attachmentRepository.FindByCondition(x => x.JobSeekerId.Equals(seekerId)).ToList();
+            var skills = jobSeekerSkillsRepository.FindByCondition(x => x.JobSeekerId.Equals(seekerId)).FirstOrDefault();
+            var languages = jobSeekerLanguageRepository.FindByCondition(x => x.JobSeekerId.Equals(seekerId)).FirstOrDefault();
+            var education = educationRepository.FindByCondition(x => x.JobSeekerId.Equals(seekerId)).FirstOrDefault();
+
+            if(String.IsNullOrEmpty(seeker.FirstName) || String.IsNullOrEmpty(seeker.PersonalProfile) || String.IsNullOrEmpty(seeker.AddressId)
+                || String.IsNullOrEmpty(seeker.Phone))
+            {
+                return false;
+            }
+
+            if (attachments.Count < 3)
+            {
+                return false;
+            }
+
+            if(skills == null)
+            {
+                return false;
+            }            
+            
+            if(languages == null)
+            {
+                return false;
+            }            
+            
+            if(education == null)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         public IList<ViewJobAdvertViewModel> GetAllByAdminRecruiter(DateTime dateFrom, DateTime dateTo, string jobTypeId = "All", string companyId = "All", string jobCategoryId = "All")
         {
             var jobAdverts = jobAdvertRepository.Get();
