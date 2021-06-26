@@ -123,29 +123,96 @@ namespace ISpaniInnerweb.Domain.Services
             return (IQueryable<JobAdvert>)JobAdverts;
         }        
         
-        public IList<ViewJobAdvertViewModel> GetAllByAdminRecruiter(string jobTypeId, string companyId, DateTime dateFrom, DateTime dateTo, string jobCategoryId = null)
+        public IList<ViewJobAdvertViewModel> GetAllByAdminRecruiter(DateTime dateFrom, DateTime dateTo, string jobTypeId = "All", string companyId = "All", string jobCategoryId = "All")
         {
             var jobAdverts = jobAdvertRepository.Get();
-            
+            // Default Date {0001/01/01 00:00:00}
             //Loop through adverts and assign into ViewJobAdvertViewModel
 
-            if (!String.IsNullOrEmpty(jobCategoryId))
-            {
-                jobAdverts = jobAdverts.Where(
-                            x => x.JobCategoryId.Equals(jobCategoryId) &&
-                            x.JobTypeId.Equals(jobTypeId) &&
-                            x.CompanyId.Equals(companyId) &&
-                            x.CreatedDate >= dateFrom &&
-                            x.CreatedDate <= dateTo
-                            ).ToList();
+            // JType | CId | CatId | SDate | EDate
+            // All | All | All | All | All
 
-                //Call process method here
-                return ProcessAdvert(jobAdverts);
-            }
-            else
+            //First Time
+            if (String.IsNullOrEmpty(jobTypeId) && String.IsNullOrEmpty(companyId) && String.IsNullOrEmpty(jobCategoryId))
             {
+                jobAdverts = jobAdverts.OrderByDescending(x => x.CreatedDate).ToList();
+                return ProcessAdvert(jobAdverts);
+
+            }
+
+            if (jobTypeId.Equals("All") && companyId.Equals("All") & jobCategoryId.Equals("All"))
+            {   
+                jobAdverts = jobAdverts.Where(x => x.CreatedDate >= dateFrom && x.CreatedDate <= dateTo)
+                                            .OrderByDescending(x => x.CreatedDate).ToList();
+                return ProcessAdvert(jobAdverts);
+
+            }//ALL | S | S
+            else if(jobTypeId.Equals("All") && !companyId.Equals("All") && !jobCategoryId.Equals("All"))
+            {
+                jobAdverts = jobAdverts.Where(x => x.CreatedDate >= dateFrom && x.CreatedDate <= dateTo && x.CompanyId.Equals(companyId)
+                                              && x.JobCategoryId.Equals(jobCategoryId))
+                                        .OrderByDescending(x => x.CreatedDate).ToList();
+                return ProcessAdvert(jobAdverts);
+            }            
+            else if(jobTypeId.Equals("All") && companyId.Equals("All") && !jobCategoryId.Equals("All"))
+            {   // ALL | ALL | S
+                jobAdverts = jobAdverts.Where(x => x.CreatedDate >= dateFrom && x.CreatedDate <= dateTo
+                                              && x.JobCategoryId.Equals(jobCategoryId))
+                                        .OrderByDescending(x => x.CreatedDate).ToList();
+                return ProcessAdvert(jobAdverts);
+            }            
+            else if(jobTypeId.Equals("All") && !companyId.Equals("All") && jobCategoryId.Equals("All"))
+            {   // ALL | S | ALL
+                jobAdverts = jobAdverts.Where(x => x.CreatedDate >= dateFrom && x.CreatedDate <= dateTo
+                                              && x.CompanyId.Equals(companyId))
+                                        .OrderByDescending(x => x.CreatedDate).ToList();
+                return ProcessAdvert(jobAdverts);
+            }           
+            else if(!jobTypeId.Equals("All") && !companyId.Equals("All") && jobCategoryId.Equals("All"))
+            {   // S | S | ALL
+                jobAdverts = jobAdverts.Where(x => x.CreatedDate >= dateFrom && x.CreatedDate <= dateTo
+                                              && x.JobTypeId.Equals(jobTypeId) && x.CompanyId.Equals(companyId))
+                                        .OrderByDescending(x => x.CreatedDate).ToList();
+                return ProcessAdvert(jobAdverts);
+            }            
+            else if(!jobTypeId.Equals("All") && companyId.Equals("All") && jobCategoryId.Equals("All"))
+            {   // S | ALL | ALL
+                jobAdverts = jobAdverts.Where(x => x.CreatedDate >= dateFrom && x.CreatedDate <= dateTo
+                                              && x.CompanyId.Equals(companyId))
+                                        .OrderByDescending(x => x.CreatedDate).ToList();
+                return ProcessAdvert(jobAdverts);
+            }            
+            else if(jobTypeId.Equals("All") && !companyId.Equals("All") && jobCategoryId.Equals("All"))
+            {   // ALL | S | ALL
+                jobAdverts = jobAdverts.Where(x => x.CreatedDate >= dateFrom && x.CreatedDate <= dateTo
+                                              && x.CompanyId.Equals(companyId))
+                                        .OrderByDescending(x => x.CreatedDate).ToList();
+                return ProcessAdvert(jobAdverts);
+            }            
+            else if(!jobTypeId.Equals("All") && companyId.Equals("All") && !jobCategoryId.Equals("All"))
+            {   // S | A | S
+                jobAdverts = jobAdverts.Where(x => x.CreatedDate >= dateFrom && x.CreatedDate <= dateTo
+                                              && x.JobTypeId.Equals(jobTypeId) && x.JobCategoryId.Equals(jobCategoryId))
+                                        .OrderByDescending(x => x.CreatedDate).ToList();
+                return ProcessAdvert(jobAdverts);
+            }            
+            else if(jobTypeId.Equals("All") && companyId.Equals("All") && !jobCategoryId.Equals("All"))
+            {   // ALL | S | ALL
+                jobAdverts = jobAdverts.Where(x => x.CreatedDate >= dateFrom && x.CreatedDate <= dateTo
+                                            && x.JobCategoryId.Equals(jobCategoryId))
+                                        .OrderByDescending(x => x.CreatedDate).ToList();
+                return ProcessAdvert(jobAdverts);
+            }            
+            else if(!jobTypeId.Equals("All") && companyId.Equals("All") && jobCategoryId.Equals("All"))
+            {   // ALL | S | ALL
+                jobAdverts = jobAdverts.Where(x => x.CreatedDate >= dateFrom && x.CreatedDate <= dateTo
+                                            && x.JobTypeId.Equals(jobTypeId))
+                                        .OrderByDescending(x => x.CreatedDate).ToList();
                 return ProcessAdvert(jobAdverts);
             }
+
+            return ProcessAdvert(jobAdverts);
+
         }
 
         public IList<ViewJobAdvertViewModel> GetAllByRecruiter(string recruiterId,string jobTypeId,string jobCategoryId = null)
@@ -255,7 +322,8 @@ namespace ISpaniInnerweb.Domain.Services
                 RecruiterPhone = recruiter.Phone,
                 RecruiterId = recruiter.Id,
                 CompanyId = company.Id,
-                IsAlreadyAppliedBySeeker = false
+                IsAlreadyAppliedBySeeker = false,
+                EndDate = advert.EndDate
             };
 
             return jobSeekerJobDetailsViewModel;
@@ -311,6 +379,7 @@ namespace ISpaniInnerweb.Domain.Services
                                 ExperienceLevel = _experienceLevelService.Get(item.ExperienceLevelId).Description,
                                 Category = _jobCategoryService.Get(item.JobCategoryId).Name,
                                 CreatedDate = (DateTime)item.CreatedDate,
+                                EndDate = (DateTime)item.EndDate,
                                 JobAdvertId = item.Id
                             });
             }

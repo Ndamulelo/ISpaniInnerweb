@@ -23,7 +23,7 @@ namespace ISpaniInnerweb.Domain.Interfaces.Services
         IList<JobAdvert> GetAll();
         //Filter with JobType, JobCategory and Province
         IQueryable<JobAdvert> GetJobAdvertsByFilter(JobAdvertSearchModel jobAdvertSearchModel);
-        IList<ViewJobAdvertViewModel> GetAllByAdminRecruiter(string jobTypeId, string companyId,DateTime dateFrom,DateTime dateTo, string jobCategoryId);
+        IList<ViewJobAdvertViewModel> GetAllByAdminRecruiter(DateTime dateFrom, DateTime dateTo,string jobTypeId, string companyId, string jobCategoryId);
         IList<ViewJobAdvertViewModel> GetAllByRecruiter(string recruiterId,string jobTypeId, string jobCategoryId = null);
         IQueryable<JobAdvert> GetByCompanyId(string companyId);
         IQueryable<JobAdvert> GetByRecruiterId(string recruiterId);

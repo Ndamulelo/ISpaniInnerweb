@@ -13,6 +13,7 @@ namespace ISpaniInnerweb.Domain.Models.JobAdvertViewModel
         public string Introduction { set; get; }
         public string City { set; get; }
         public DateTime CreatedDate { set; get; }
+        public DateTime EndDate { set; get; }
         public string JobType { set; get; }
         public string ExperienceLevel { set; get; }
     }

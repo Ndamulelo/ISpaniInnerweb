@@ -25,5 +25,6 @@ namespace ISpaniInnerweb.Domain.Models.JobAdvertViewModel
         public string ExperienceLevel { set; get; } //Entry, Intermediate, Experienced
         public string JobType { set; get; } //Contract, Permenant , part-time
         public DateTime? CreatedDate { set; get; }
+        public DateTime? EndDate { set; get; }
     }
 }

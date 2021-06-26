@@ -308,7 +308,11 @@ namespace ISpaniInnerweb.Controllers
             var companies = _companyService.GetAll();
             var jobTypes = _jobTypeService.GetAll();
             var jobCategories = _jobCategoryService.GetAll();
-            var jobAdverts = _jobAdvertService.GetAllByAdminRecruiter(jobTypeId,companyId,dateFrom,dateTo,jobCategoryId);
+            var jobAdverts = _jobAdvertService.GetAllByAdminRecruiter( dateFrom, dateTo, jobTypeId, companyId,jobCategoryId);
+            //Initialize all
+            companies.Insert(0, new Company { Id = "All", CompanyName = "All" });
+            jobTypes.Insert(0, new JobType { Id = "All", Description = "All" });
+            jobCategories.Insert(0, new JobCategory { Id = "All", Name = "All" });
 
             AdminRecruiterSearchAdvertViewModel adminRecruiterSearchAdvertViewModel = new AdminRecruiterSearchAdvertViewModel
             {
