@@ -21,6 +21,7 @@ namespace ISpaniInnerweb.Controllers
 {
     public class JobAdvertController : Controller
     {
+        private readonly IUserService _userService;
         private readonly IEmailService _emailService;
         private readonly ICompanyService _companyService;
         private readonly IJobAdvertService _jobAdvertService;
@@ -41,8 +42,9 @@ namespace ISpaniInnerweb.Controllers
         public JobAdvertController(ICompanyService companyService, IJobAdvertService jobAdvertService, IExperienceLevelService experienceLevelService,
             IProvinceService provinceService, IRecruiterService recruiterService, IJobCategoryService jobCategoryService,IJobTypeService jobTypeService,
             IStringManipulator stringManipulator, ICityService cityService, IJobSeekerService jobSeekerService, IWebHostEnvironment webHostEnvironment,
-            IEmailService emailService)
+            IEmailService emailService, IUserService userService)
         {
+            _userService = userService;
             _emailService = emailService;
             _companyService = companyService;
             _jobSeekerService = jobSeekerService;
@@ -108,6 +110,11 @@ namespace ISpaniInnerweb.Controllers
                 if (sessionObject.Get<string>("Role").Equals("Admin"))
                 {
                     _jobAdvertService.Create(createJobAdvertViewModel);
+                    //Send Notification to Recruiter
+                    _emailService.SendMail(createJobAdvertViewModel.Caption + " Job Advert Is Assigned To You",
+                   "Good day \n\n I trust that this email finds you well.\n\n This email is to notify you that a job advert has been" +
+                   "assigned to you successfully by Administrator. You will be recruiting for this job, you can find more details on the system\n\n" +
+                   "Thank you\n\n Kind Regards\nISpani Innerweb Recruitment", _userService.GetByUserId(createJobAdvertViewModel.RecruiterId).Email);
                 }
                 else
                 {
@@ -118,6 +125,11 @@ namespace ISpaniInnerweb.Controllers
                     createJobAdvertViewModel.CompanyId = recruiter.CompanyId;
 
                     _jobAdvertService.Create(createJobAdvertViewModel);
+                    //Send Notification to Recruiter
+                    _emailService.SendMail(createJobAdvertViewModel.Caption + " Job Advert Is Created",
+                   "Good day \n\n I trust that this email finds you well.\n\n This email is to confirm that a job advert has been" +
+                   "created successfully.\n\n" +
+                   "Thank you\n\n Kind Regards\nISpani Innerweb Recruitment", _userService.GetByUserId(createJobAdvertViewModel.RecruiterId).Email);
                 }
                 //Redirect to success page
                 return View(PrepareJobAdvertModel());
@@ -163,9 +175,20 @@ namespace ISpaniInnerweb.Controllers
             _jobSeekerService.ScheduleInterview(scheduleInterview, interview);
             //Update status on JobApplication Table
             _jobAdvertService.InviteToInverView(interview.JobAdvertId, interview.JobSeekerId);
-            //Send notification
+            //Send notification to Seeker
+                        _emailService.SendMail("Interview Invitation For " + scheduleInterview.JobAdvert.Caption +" With " + scheduleInterview.Company.CompanyName ,
+            "Good day \n\n I trust that this email finds you well.\n\n Your CV was shortlisted and we hope you know more about you " +
+            "at the interview with us.\n\n Interview Details \n\n Date: " + interview.InterviewDate.Value.ToString("yyyy-MM-dd") +
+            "\nTime: "+interview.InterviewDate.Value.ToString("HH:mm")+"\nAddress:  "+scheduleInterview.Address.StreetNumber+","+
+            scheduleInterview.Address.StreetName+"\n\n Kind Regards\nISpani Innerweb Recruitment", _userService.GetByUserId(interview.JobSeekerId).Email);
 
-
+            //Send to recruiter
+            _emailService.SendMail("Interview Invitation For " + scheduleInterview.JobAdvert.Caption+" Has Been Scheduled",
+            "Good day \n\n I trust that this email finds you well.\n\n This email is to confirm that an interview for  " + scheduleInterview.JobAdvert.Caption+
+            "with "+scheduleInterview.JobSeeker.FirstName+" "+ scheduleInterview.JobSeeker.LastName +" has been scheduled.\n\n Interview Details \n\n Date: " + interview.DateCreated.Value.ToString("yyyy-MM-dd") +
+            "\nTime: " + interview.InterviewDate.Value.ToString("HH:mm") + "\nAddress:  " + scheduleInterview.Address.StreetNumber + "," +
+            scheduleInterview.Address.StreetName + "\n\n Kind Regards\nISpani Innerweb Recruitment", _userService.GetByUserId(interview.JobSeekerId).Email);
+            
             return View("InterviewInviteSuccess"); 
         }
         //Exporting Applicant Interviews
@@ -392,6 +415,13 @@ namespace ISpaniInnerweb.Controllers
 
             //Call service to update job Application ststus
             _jobAdvertService.DeclineApplication(jobAdvertId, jobSeekerId);
+            var advert = _jobAdvertService.Get(jobAdvertId);
+
+            _emailService.SendMail("Application For " + advert.Caption + " Was Declined",
+"Good day \n\n I trust that this email finds you well.\n\n We regret to inform you that your application for " +
+"was unsuccessful.\n\n You are welcome to apply again in future \n\n" +
+"Thank you\n\n Kind Regards\nISpani Innerweb Recruitment", _userService.GetByUserId(jobSeekerId).Email);
+
             return View("InterviewDeclineSuccess");
         }
 

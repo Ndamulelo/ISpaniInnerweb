@@ -31,6 +31,30 @@ namespace ISpaniInnerweb.Controllers
 
         public IActionResult Index()
         {
+            var session = HttpContext.Session;
+
+            if (session.IsAvailable)
+            {
+                var role = HttpContext.Session.Get<string>("Role");
+
+                if (role == null)
+                {
+                    return View();
+                }
+
+                if (role.Equals("Admin"))
+                {
+                    return RedirectToAction("Index", "Admin");
+                }
+                else if(role.Equals("Recruiter"))
+                { 
+                    return RedirectToAction("Index", "Recruiter");
+                }
+                else if(role.Equals("JobSeeker"))
+                {
+                    return RedirectToAction ("Index", "JobSeeker");
+                }
+            }
 
             return View();
         }

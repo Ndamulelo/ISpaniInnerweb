@@ -310,33 +310,33 @@ namespace ISpaniInnerweb.Domain.Services
             {
                 if(jobCategoryId.Equals("All") && jobCityId.Equals("All"))
                 {
-                    jobAdverts = jobAdverts.Where(x =>(x.EndDate.Value.Date - DateTime.Now.Date).Days > -1).ToList();
+                    jobAdverts = jobAdverts.Where(x =>(x.EndDate.Value.Date - DateTime.Now.Date).Days > -1).OrderBy(x => x.EndDate).ToList();
                     return ProcessAdvert(jobAdverts);
                 }
                 else if(jobCategoryId.Equals("All") && !jobCityId.Equals("All"))
                 {
                     jobAdverts = jobAdverts.Where(x=>
-                                x.CityId.Equals(jobCityId) && (x.EndDate.Value.Date - DateTime.Now.Date).Days > -1).ToList();
+                                x.CityId.Equals(jobCityId) && (x.EndDate.Value.Date - DateTime.Now.Date).Days > -1).OrderBy(x => x.EndDate).ToList();
                     return ProcessAdvert(jobAdverts);
                 }
                 else if(!jobCategoryId.Equals("All") && jobCityId.Equals("All"))
                 {
                     jobAdverts = jobAdverts.Where(
-                                    x => x.JobCategoryId.Equals(jobCategoryId) && (x.EndDate.Value.Date - DateTime.Now.Date).Days > -1).ToList();
+                                    x => x.JobCategoryId.Equals(jobCategoryId) && (x.EndDate.Value.Date - DateTime.Now.Date).Days > -1).OrderBy(x => x.EndDate).ToList();
                     return ProcessAdvert(jobAdverts);
                 }
                 //For the first time when a page loads
                 jobAdverts = jobAdverts.Where(
                             x => x.JobCategoryId.Equals(jobCategoryId) &&
                             x.CityId.Equals(jobCityId) && (x.EndDate.Value.Date - DateTime.Now.Date).Days > -1 
-                            ).ToList();
+                            ).OrderBy(x => x.EndDate).ToList();
 
                 //Call process method here
                 return ProcessAdvert(jobAdverts);
             }
             else
             {
-                jobAdverts = jobAdverts.Where(x => (x.EndDate.Value.Date - DateTime.Now.Date).Days > -1).ToList();
+                jobAdverts = jobAdverts.Where(x => (x.EndDate.Value.Date - DateTime.Now.Date).Days > -1).OrderBy(x => x.EndDate).ToList();
                 return ProcessAdvert(jobAdverts);
             }
         }
