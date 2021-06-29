@@ -193,13 +193,15 @@
 
                     foreach (var skill in Model.JobSeekerSkillsViewModel)
                     {
+                            if (item.Id.Equals(skill.SkillLevelId))
+                            {
 
-
-                        <p>@skill.SkillDescription</p>
+                                <p>@skill.SkillDescription</p>
+                            }
+                        }
                     }
                 }
             }
-        }
 
     </div>
 </div>
@@ -207,7 +209,7 @@
 <!-- Language -->
 <div class="card">
     <div class="card-header header-elements-inline">
-        <h5 class="card-title font-weight-bold">Skills</h5>
+        <h5 class="card-title font-weight-bold">Languages</h5>
         <div class="header-elements">
             <div class="list-icons">
                 <a class="list-icons-item" data-action="collapse"></a>
@@ -227,9 +229,11 @@
 
                     foreach (var language in Model.JobSeekerLanguagesViewModel)
                     {
+                        if (item.Id.Equals(language.LanguageLevelId))
+                        {
+                            <p>@language.LanguageName</p>
+                        }
 
-
-                        <p>@language.LanguageName</p>
                     }
                 }
             }
