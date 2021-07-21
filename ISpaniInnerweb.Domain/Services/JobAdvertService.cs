@@ -134,17 +134,18 @@ namespace ISpaniInnerweb.Domain.Services
         
         public bool IsProfileComplete(string seekerId)
         {
-            var seeker = jobSeekerRepository.Get(seekerId);
+            
+            // var seeker = jobSeekerRepository.FindByCondition(s => s.Id.Equals(seekerId)).FirstOrDefault();
             var attachments = attachmentRepository.FindByCondition(x => x.JobSeekerId.Equals(seekerId)).ToList();
             var skills = jobSeekerSkillsRepository.FindByCondition(x => x.JobSeekerId.Equals(seekerId)).FirstOrDefault();
             var languages = jobSeekerLanguageRepository.FindByCondition(x => x.JobSeekerId.Equals(seekerId)).FirstOrDefault();
             var education = educationRepository.FindByCondition(x => x.JobSeekerId.Equals(seekerId)).FirstOrDefault();
 
-            if(String.IsNullOrEmpty(seeker.FirstName) || String.IsNullOrEmpty(seeker.PersonalProfile) || String.IsNullOrEmpty(seeker.AddressId)
-                || String.IsNullOrEmpty(seeker.Phone))
-            {
-                return false;
-            }
+            // if(String.IsNullOrEmpty(seeker.FirstName) || String.IsNullOrEmpty(seeker.PersonalProfile) || String.IsNullOrEmpty(seeker.AddressId)
+            //   || String.IsNullOrEmpty(seeker.Phone))
+           // {
+                // return false;
+            // }
 
             if (attachments.Count < 3)
             {

@@ -170,9 +170,25 @@ namespace ISpaniInnerweb.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult ScheduleInterview(Interview interview) 
         {
-            var scheduleInterview = _jobSeekerService.GetJobSeekerApplicationByAdvertId(interview.JobAdvertId,interview.JobSeekerId);
-                
-            _jobSeekerService.ScheduleInterview(scheduleInterview, interview);
+            var scheduleInterview = new ScheduleInterviewViewModel();
+
+            // Check if a user is already scheduled for an interview
+            if (_jobSeekerService.IsAlreadyScheduledForThisJob(interview.JobAdvertId, interview.JobSeekerId))
+            {
+                //We update interview
+                _jobSeekerService.UpdateInterview(interview);
+                TempData["isAlreadyScheduled"] = "yes";
+                return View();
+            }
+            else
+            {
+                scheduleInterview = _jobSeekerService.GetJobSeekerApplicationByAdvertId(interview.JobAdvertId, interview.JobSeekerId);
+
+                _jobSeekerService.ScheduleInterview(scheduleInterview, interview);
+                TempData["isAlreadyScheduled"] = "no";
+            }
+
+
             //Update status on JobApplication Table
             _jobAdvertService.InviteToInverView(interview.JobAdvertId, interview.JobSeekerId);
             //Send notification to Seeker
@@ -374,7 +390,8 @@ namespace ISpaniInnerweb.Controllers
             //Redirect to profile if applicant's profile is still incomplete.
             if(!_jobAdvertService.IsProfileComplete(HttpContext.Session.Get<string>("JobSeekerId")))
             {
-                RedirectToAction("Profile", "JobSeeker");
+                TempData["incompleteProfile"] = "Please complete a profile in order to start applying for jobs. \nThank you";
+                return RedirectToAction("Profile", "JobSeeker");
             }
 
             _jobAdvertService.ApplyJob(

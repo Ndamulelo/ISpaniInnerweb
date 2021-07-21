@@ -2,7 +2,9 @@
 @{
     ViewData["Title"] = "InterviewInviteSuccess";
     Layout = "~/Views/Shared/_AdminRecruiterLayout.cshtml";
+
+    var message = TempData["isAlreadyScheduled"].Equals("yes") ? "Interview Was Updated Successfully. Email for Interview Invitation Was Sent To An Applicant" : "Interview Scheduled Successfully. Email for Interview Invitation Was Sent To An Applicant";
 }
 
-<div class="alert alert-success text-center">Email for Interview Invitation Was Sent To An Applicant</div>
+<div class="alert alert-success text-center">@message</div>
 

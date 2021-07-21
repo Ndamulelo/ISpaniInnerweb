@@ -425,6 +425,23 @@ namespace ISpaniInnerweb.Domain.Services
                 RecruiterEmail = recruiterEmail
             };
         }
+        public bool IsAlreadyScheduledForThisJob(string advertId, string seekerId)
+        {
+            var interview = interviewRepository.FindByCondition(x => x.JobSeekerId.Equals(seekerId) && x.JobAdvertId.Equals(advertId)).FirstOrDefault();
+
+            return interview == null ? false : true;
+        }
+
+        public void UpdateInterview(Interview interview)
+        {
+            var interviewToUpdate = interviewRepository.FindByCondition(x => x.JobSeekerId.Equals(interview.JobSeekerId) && x.JobAdvertId.Equals(interview.JobAdvertId)).FirstOrDefault();
+            interviewToUpdate.InterviewDate = interview.InterviewDate;
+            interviewToUpdate.InterviewLink = interview.InterviewType.Equals("Virtual") ? interview.InterviewLink.Substring(interview.InterviewLink.IndexOf("https://")) : "";
+            interviewToUpdate.Interviewer = interview.Interviewer;
+            interviewToUpdate.InterviewType = interview.InterviewType;
+
+            interviewRepository.Update(interviewToUpdate);
+        }
 
         public void ScheduleInterview(ScheduleInterviewViewModel scheduleInterviewViewModel, Interview interview)
         {
