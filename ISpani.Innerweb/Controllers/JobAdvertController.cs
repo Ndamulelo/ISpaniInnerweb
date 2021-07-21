@@ -170,23 +170,23 @@ namespace ISpaniInnerweb.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult ScheduleInterview(Interview interview) 
         {
-            var scheduleInterview = new ScheduleInterviewViewModel();
+            //var scheduleInterview = new ScheduleInterviewViewModel();
 
             // Check if a user is already scheduled for an interview
-            if (_jobSeekerService.IsAlreadyScheduledForThisJob(interview.JobAdvertId, interview.JobSeekerId))
-            {
+            //if (_jobSeekerService.IsAlreadyScheduledForThisJob(interview.JobAdvertId, interview.JobSeekerId))
+            //{
                 //We update interview
-                _jobSeekerService.UpdateInterview(interview);
-                TempData["isAlreadyScheduled"] = "yes";
-                return View();
-            }
-            else
-            {
-                scheduleInterview = _jobSeekerService.GetJobSeekerApplicationByAdvertId(interview.JobAdvertId, interview.JobSeekerId);
+                //_jobSeekerService.UpdateInterview(interview);
+                //TempData["isAlreadyScheduled"] = "yes";
+                //return View();
+            //}
+            //else
+            //{
+                var scheduleInterview = _jobSeekerService.GetJobSeekerApplicationByAdvertId(interview.JobAdvertId, interview.JobSeekerId);
 
                 _jobSeekerService.ScheduleInterview(scheduleInterview, interview);
-                TempData["isAlreadyScheduled"] = "no";
-            }
+                //TempData["isAlreadyScheduled"] = "no";
+            //}
 
 
             //Update status on JobApplication Table
